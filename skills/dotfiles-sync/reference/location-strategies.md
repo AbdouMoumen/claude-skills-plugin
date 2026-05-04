@@ -21,10 +21,6 @@ Accept a path only when it contains the expected repository markers:
 
 - `SETUP.md`
 - `CLAUDE.md`
-- `claude/settings.json`
-- `claude/skills/`
-- `copilot/config.json`
-- `copilot/mcp-config.json`
 - `copilot/prompts/`
 
 Do not accept a path only because it is named `dotfiles`.
@@ -33,11 +29,11 @@ Do not accept a path only because it is named `dotfiles`.
 
 ### Current repository
 
-Best when Claude Code is already opened in the dotfiles repo. It is immediate and needs no machine state.
+Best when the agent is already opened in the dotfiles repo. It is immediate and needs no machine state.
 
 ### Symlink back-reference
 
-Best after initial setup. Existing links such as `~/.claude/skills` can be resolved back to the repository.
+Best after initial setup. Existing links such as VS Code `User/prompts` or `~/.copilot/mcp-config.json` can be resolved back to the repository.
 
 Limit: cannot bootstrap a brand-new machine before links exist.
 
@@ -69,9 +65,10 @@ Recommended pointer file:
 }
 ```
 
-Recommended location:
+Recommended locations:
 
-- `~/.claude/dotfiles-sync.json`
+- `~/.claude/dotfiles-sync.json` (Claude Code)
+- `~/.copilot/dotfiles-sync.json` (Copilot CLI)
 
 Benefits:
 
@@ -109,6 +106,6 @@ Use only as a non-authoritative hint supplied by the user or by local context. D
 When a user-provided or common-path candidate is validated:
 
 1. Ask whether to save it as the machine-local pointer.
-2. Create `~/.claude/` if it does not exist.
-3. Write `~/.claude/dotfiles-sync.json` with the absolute repo path.
+2. Create `~/.claude/` or `~/.copilot/` if it does not exist.
+3. Write the pointer file with the absolute repo path.
 4. On future runs, still validate before use.

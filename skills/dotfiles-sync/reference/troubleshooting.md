@@ -2,9 +2,9 @@
 
 ## Repository cannot be found
 
-Ask the user for the absolute path to the dotfiles clone, then validate it by checking for repository markers such as `SETUP.md`, `CLAUDE.md`, `claude/settings.json`, and `copilot/config.json`.
+Ask the user for the absolute path to the dotfiles clone, then validate it by checking for repository markers: `SETUP.md`, `CLAUDE.md`, and `copilot/prompts/`.
 
-If valid, offer to save the path to `~/.claude/dotfiles-sync.json`.
+If valid, offer to save the path to the pointer file (`~/.claude/dotfiles-sync.json` or `~/.copilot/dotfiles-sync.json`).
 
 ## Multiple repositories found
 
@@ -36,6 +36,15 @@ If a target exists and is not a symlink, back it up before linking:
 
 Never delete existing config without a backup.
 
+## Vestigial symlinks
+
+After the migration from symlinked skills/settings to the plugin system, some machines may still have vestigial symlinks:
+
+- `~/.claude/skills` → was a directory symlink to `<repo>/claude/skills`
+- `~/.claude/settings.json` → was a file symlink to `<repo>/claude/settings.json`
+
+These are now listed as "Not Managed" in the target state. If found as symlinks, offer to remove the link. For `settings.json`, restore a real file with the current content before removing the symlink.
+
 ## Link points to the wrong clone
 
 Classify it as `WRONG_LINK`. Remove the symlink itself and recreate it to point at the resolved repo.
@@ -56,19 +65,25 @@ If multiple variants exist, ask which one to manage.
 
 After changing prompt links, reload VS Code or restart the Copilot session.
 
-## Claude skills not loading
+## Claude Code plugins not installing
 
-Check that `~/.claude/skills/dotfiles-sync/SKILL.md` is reachable through the symlink.
+Common issues:
 
-Then restart Claude Code. Skills are loaded at session startup.
+- **Marketplace not registered**: Run `claude plugin marketplace add <url>` first, then `claude plugin install <name>`.
+- **Network/auth failure**: Clone the repo locally to `~/.claude/plugins/marketplaces/<name>`, then run `claude plugin marketplace add <local-path>`.
+- **Plugin not found after marketplace add**: Check that the marketplace's `marketplace.json` or `plugin.json` lists the plugin name correctly.
+
+## Copilot CLI plugins not installing
+
+Common issues:
+
+- **Plugin source directory not found** (double-nested `plugins/plugins/...`): This is a bug in the marketplace's `marketplace.json`. If `pluginRoot` is set (e.g., `./plugins`), then each plugin's `source` must be relative to that root (e.g., `./ppux-pr-workflow` not `./plugins/ppux-pr-workflow`). Fix the manifest and retry.
+- **Plugin name wrong**: Copilot CLI uses the format `<plugin-name>:<marketplace-name>` (e.g., `ppux-pr-workflow:ppux-plugins`). The marketplace name is not the repo name.
+- **Update fails**: Use `/plugin update <plugin-name>:<marketplace-name>`.
 
 ## JSON / JSONC validation fails
 
-Stop and report the failing file. Do not claim setup is healthy until these parse successfully:
-
-- `claude/settings.json`
-- `copilot/config.json`
-- `copilot/mcp-config.json`
+Stop and report the failing file. Do not claim setup is healthy until managed JSON files parse successfully.
 
 Some Copilot config files may contain JSONC-style comments. Use a JSONC-compatible parser when comments are present instead of strict JSON-only parsing.
 
