@@ -308,9 +308,9 @@ The skill cannot install Copilot CLI plugins programmatically. Instead, output t
 
 ```text
 Run these commands to install missing Copilot CLI plugins:
-  /plugin install ppux-pr-workflow:ppux-plugins
-  /plugin install devbox:ppux-plugins
-  /plugin install session-analyzer:ppux-plugins
+  /plugin install ppux-pr-workflow@ppux-plugins
+  /plugin install devbox@ppux-plugins
+  /plugin install session-analyzer@ppux-plugins
 ```
 
 ### Phase 5: Execute Plan

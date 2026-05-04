@@ -78,8 +78,8 @@ Common issues:
 Common issues:
 
 - **Plugin source directory not found** (double-nested `plugins/plugins/...`): This is a bug in the marketplace's `marketplace.json`. If `pluginRoot` is set (e.g., `./plugins`), then each plugin's `source` must be relative to that root (e.g., `./ppux-pr-workflow` not `./plugins/ppux-pr-workflow`). Fix the manifest and retry.
-- **Plugin name wrong**: Copilot CLI uses the format `<plugin-name>:<marketplace-name>` (e.g., `ppux-pr-workflow:ppux-plugins`). The marketplace name is not the repo name.
-- **Update fails**: Use `/plugin update <plugin-name>:<marketplace-name>`.
+- **Plugin name wrong**: Copilot CLI uses the format `<plugin-name>@<marketplace-name>` (e.g., `ppux-pr-workflow@ppux-plugins`). The marketplace name is not the repo name.
+- **Update fails**: Use `/plugin update <plugin-name>@<marketplace-name>`.
 
 ## JSON / JSONC validation fails
 
