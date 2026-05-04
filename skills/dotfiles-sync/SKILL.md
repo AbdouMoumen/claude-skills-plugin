@@ -105,7 +105,27 @@ Check candidates in this order and stop at the first valid one:
    - `~/github/dotfiles`
    - `~/repos/dotfiles`
    - Windows equivalents under `%USERPROFILE%`
-6. Ask the user for the path. After validating it, offer to save it to the machine-local pointer file.
+6. Ask the user. They may provide:
+   - A local path → validate it. If valid, offer to save it to the pointer file.
+   - A git remote URL (e.g. `https://github.com/user/dotfiles.git`) → clone it (see below), then validate.
+   - Just a repo name like `user/dotfiles` → assume `https://github.com/<repo>.git`.
+
+#### Cloning on a new machine
+
+If no local clone exists, offer to clone. Ask the user for:
+
+1. The repo URL (or confirm the default: `https://github.com/AbdouMoumen/dotfiles.git`).
+2. The clone destination (suggest `~/repos/github/dotfiles` on Windows, `~/dotfiles` on macOS/Linux).
+
+```powershell
+git clone "<url>" "<destination>"
+```
+
+```bash
+git clone "<url>" "<destination>"
+```
+
+After cloning, validate the candidate markers. If valid, save the path to the pointer file and continue to Phase 2.
 
 #### Exact locator commands
 
