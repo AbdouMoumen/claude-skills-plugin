@@ -167,7 +167,7 @@ details.stale-sessions>.stale-body{padding:6px 10px 8px;}
 .ai-note::before{content:"✦ ";color:var(--dim);}
 
 /* ── View switcher ── */
-.view-switcher{display:flex;gap:0;border-bottom:1px solid var(--bd);background:var(--s0);padding:0 18px;}
+.view-switcher{display:flex;gap:0;border-bottom:1px solid var(--bd);background:var(--s0);padding:0 18px;position:sticky;top:0;z-index:99;}
 .vs-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--mu);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;}
 .vs-btn:hover{color:var(--tx);}
 .vs-btn.active{color:var(--bl);border-bottom-color:var(--bl);}
@@ -288,6 +288,14 @@ details.stale-sessions>.stale-body{padding:6px 10px 8px;}
 </div>
 
 <script>
+function stickyViewSwitcher() {
+  var tb = document.querySelector('.topbar');
+  var vs = document.querySelector('.view-switcher');
+  if (tb && vs) vs.style.top = tb.offsetHeight + 'px';
+}
+stickyViewSwitcher();
+window.addEventListener('resize', stickyViewSwitcher);
+
 function computeStaleness() {
   var now = new Date();
   var WARN_MS  = 15 * 60 * 1000;  // 15 min → yellow
