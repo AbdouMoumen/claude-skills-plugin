@@ -171,12 +171,29 @@ For each repo in the machine's snapshot:
 Omit this section entirely if `git.branches` is absent or empty.
 
 **Sessions section** (`rc-sessions`) — only if `aiSessions` is non-empty:
+
+Split sessions into **live** (`state !== "stale"` and `lockTime` not >30min old) and **stale** groups. Render live sessions directly, then stale sessions inside a collapsed `<details>`:
+
 ```html
 <div class="rc-sessions">
   <div class="sess-lbl">{N} active session{s}</div>
-  <!-- sess-item per session -->
+  <!-- sess-item per LIVE session -->
+
+  <!-- Stale sessions: collapsible, collapsed by default — only if stale sessions exist -->
+  <details class="stale-sessions">
+    <summary>
+      <span class="stale-ch">▶</span>
+      <span class="stale-count">{M}</span>
+      <span>{M} stale session{s}</span>
+    </summary>
+    <div class="stale-body">
+      <!-- sess-item.si-stall per STALE session -->
+    </div>
+  </details>
 </div>
 ```
+
+If all sessions are live, omit the `<details class="stale-sessions">` block. If all sessions are stale (no live sessions), still use the collapsed `<details>` for the stale sessions but change the label to `<div class="sess-lbl">{M} session{s} (all stale)</div>`.
 
 Each session item (`sess-item`):
 - Name: `description` → fallback `processName` → fallback `"Unnamed Session"`
