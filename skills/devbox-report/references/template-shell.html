@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DevBox Status</title>
+<style>
+:root{
+  --bg:#1e1e2e;--s0:#2a2a3e;--s1:#313145;--s2:#252535;--bd:#3d3d55;--bd2:#4a4a66;
+  --tx:#cdd6f4;--mu:#7f849c;--dim:#585b70;
+  --bl:#89b4fa;--ye:#f9e2af;--gr:#a6e3a1;--rd:#f38ba8;--pe:#fab387;--ma:#cba6f7;--te:#94e2d5;
+  --fm:'Cascadia Code','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Segoe UI',sans-serif;font-size:13px;line-height:1.5;}
+
+/* ── Top bar ── */
+.topbar{background:var(--s0);border-bottom:1px solid var(--bd);padding:10px 18px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+.topbar h1{font-size:17px;font-weight:700;white-space:nowrap;align-self:center;}
+.filters{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;flex:1;}
+.filter-group{display:flex;flex-direction:column;gap:3px;}
+.f-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;}
+.f-select{background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:12px;padding:5px 10px;font-family:inherit;outline:none;cursor:pointer;height:30px;}
+.f-select:focus{border-color:var(--bl);}
+.f-machine-sel{border-color:#89b4fa55;min-width:160px;font-weight:600;color:var(--bl);}
+.f-input{background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:12px;padding:5px 10px;font-family:inherit;outline:none;min-width:130px;height:30px;}
+.f-input:focus{border-color:var(--bl);}
+.f-attn{background:var(--s1);border:1px solid var(--bd);color:var(--mu);border-radius:6px;padding:0 12px;font-size:11px;cursor:pointer;height:30px;white-space:nowrap;}
+.f-attn.active{background:#f9e2af18;color:var(--ye);border-color:#f9e2af44;}
+.f-clear{background:none;border:1px solid var(--bd);color:var(--dim);border-radius:6px;padding:0 10px;font-size:11px;cursor:pointer;height:30px;}
+.f-clear:hover{color:var(--rd);border-color:#f38ba844;}
+.topbar-meta{color:var(--mu);font-size:11px;white-space:nowrap;margin-left:auto;align-self:center;}
+
+/* ── In-machine ad-hoc section ── */
+.adhoc-section{border-top:1px solid var(--bd);padding:8px 12px 10px;background:var(--s2);}
+.adhoc-hdr{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);font-weight:700;margin-bottom:6px;}
+.adhoc-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.adhoc-item{background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:7px 10px;min-width:200px;flex:1;}
+.adhoc-name{font-size:12px;color:var(--mu);font-weight:600;margin-bottom:2px;}
+.adhoc-cwd{font-size:10px;color:var(--dim);font-family:var(--fm);margin-bottom:4px;}
+
+/* ── Summary strip ── */
+.sumstrip{display:flex;gap:0;border-bottom:1px solid var(--bd);background:var(--s2);}
+.scard{padding:8px 18px;border-right:1px solid var(--bd);text-align:center;}
+.scard .v{font-size:18px;font-weight:700;line-height:1;}
+.scard .l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.sv-blue{color:var(--bl);}
+.sv-gr{color:var(--gr);}
+.sv-ye{color:var(--ye);}
+.sv-mu{color:var(--mu);}
+
+/* ── Main content ── */
+.content{padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
+
+/* ── Machine section ── */
+details.machine{background:var(--s0);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+details.machine>summary{
+  display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;
+  list-style:none;user-select:none;background:var(--s1);
+}
+details.machine>summary::-webkit-details-marker{display:none;}
+details.machine>summary .ch{color:var(--mu);font-size:11px;transition:transform .2s;display:inline-block;}
+details.machine[open]>summary .ch{transform:rotate(90deg);}
+.m-name{font-weight:700;font-size:15px;}
+.m-meta{font-size:11px;color:var(--mu);}
+.m-attn{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af44;border-radius:10px;padding:2px 9px;font-size:11px;font-weight:700;}
+.m-snap{font-size:11px;margin-left:auto;display:flex;align-items:center;gap:6px;}
+.snap-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;border:1px solid;}
+.snap-ok{background:#a6e3a118;color:var(--gr);border-color:#a6e3a138;}
+.snap-warn{background:#f9e2af18;color:var(--ye);border-color:#f9e2af44;}
+.snap-stale{background:#f38ba818;color:var(--rd);border-color:#f38ba844;animation:pulse-stale 2s infinite;}
+@keyframes pulse-stale{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── Repos grid ── */
+.repos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;padding:12px;}
+
+/* ── Repo card ── */
+.repo-card{background:var(--bg);border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
+.repo-card.has-attn{border-color:#f9e2af44;}
+
+/* Repo header */
+.rc-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+.rc-name{font-weight:700;font-size:15px;font-family:var(--fm);}
+.branch-pill{background:var(--s1);border:1px solid var(--bd);border-radius:4px;font-size:10px;font-family:var(--fm);color:var(--ma);padding:2px 7px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.attn-badge{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af44;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:auto;}
+.attn-badge.warn{background:#f38ba818;color:var(--rd);border-color:#f38ba844;}
+
+/* Repo git state */
+.rc-git{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid var(--bd);font-size:11px;flex-wrap:wrap;}
+.hash{font-family:var(--fm);color:var(--te);font-size:10px;}
+.cmsg{color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
+.cage{color:var(--mu);}
+.pill{display:inline-flex;align-items:center;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600;}
+.p-un{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af38;}
+.p-ut{background:#6c708618;color:#9fa0b2;border:1px solid #6c708638;}
+.p-st{background:#fab38718;color:var(--pe);border:1px solid #fab38738;}
+.p-ah{background:#a6e3a118;color:var(--gr);border:1px solid #a6e3a138;}
+.p-bh{background:#f38ba818;color:var(--rd);border:1px solid #f38ba838;}
+
+/* Expandable branches */
+details.branches{border-bottom:1px solid var(--bd);}
+details.branches>summary{
+  padding:6px 14px;cursor:pointer;list-style:none;user-select:none;
+  font-size:11px;color:var(--mu);display:flex;align-items:center;gap:6px;
+}
+details.branches>summary::-webkit-details-marker{display:none;}
+details.branches>summary .bch{font-size:10px;transition:transform .2s;}
+details.branches[open]>summary .bch{transform:rotate(90deg);}
+.branch-list{padding:4px 14px 10px;}
+.branch-row{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--bd);font-size:11px;}
+.branch-row:last-child{border-bottom:none;}
+.br-name{font-family:var(--fm);color:var(--ma);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.br-name.current{color:var(--gr);}
+.br-age{color:var(--mu);font-size:10px;white-space:nowrap;}
+.br-msg{color:var(--mu);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:2;}
+.cur-dot{width:6px;height:6px;background:var(--gr);border-radius:50%;flex-shrink:0;}
+.no-dot{width:6px;height:6px;flex-shrink:0;}
+
+/* Sessions */
+.rc-sessions{padding:8px 14px;}
+.sess-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);font-weight:700;margin-bottom:6px;}
+.sess-item{border:1px solid var(--bd);border-radius:6px;padding:8px 10px;margin-bottom:7px;background:var(--s0);}
+.sess-item:last-child{margin-bottom:0;}
+.sess-item.si-stall{border-color:#f9e2af33;}
+.sess-item.si-block{border-color:#f38ba833;}
+.sess-item.si-done{border-color:#f9e2af33;}
+.si-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+.si-name{font-weight:600;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.el{font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;white-space:nowrap;font-family:var(--fm);}
+.el-g{background:#a6e3a118;color:var(--gr);border:1px solid #a6e3a138;}
+.el-a{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af38;}
+.el-r{background:#f38ba818;color:var(--rd);border:1px solid #f38ba838;}
+/* todo bar */
+.todo-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;background:var(--s1);margin-bottom:3px;}
+.td-done{background:var(--gr);}
+.td-blk{background:var(--rd);}
+.td-pend{background:var(--bd2);}
+.todo-lbl{font-size:10px;color:var(--mu);margin-bottom:5px;}.todo-lbl .g{color:var(--gr);}.todo-lbl .r{color:var(--rd);}
+/* action row */
+.si-action{display:flex;align-items:center;gap:6px;font-size:11px;flex-wrap:wrap;}
+.ab{padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;white-space:nowrap;}
+.ab-tool{background:#89b4fa18;color:var(--bl);border:1px solid #89b4fa38;}
+.ab-think{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af38;}
+.ab-stall{background:#f38ba818;color:var(--rd);border:1px solid #f38ba838;}
+.ab-done{background:#a6e3a118;color:var(--gr);border:1px solid #a6e3a138;}
+.act-txt{color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-family:var(--fm);font-size:10px;}
+/* session ID row */
+.si-id{display:flex;align-items:center;gap:5px;margin-top:5px;}
+.id-lbl{font-size:10px;color:var(--dim);}
+.id-val{font-family:var(--fm);font-size:10px;color:var(--dim);}
+.copy-btn{background:var(--s1);border:1px solid var(--bd);color:var(--mu);border-radius:4px;padding:1px 7px;font-size:10px;cursor:pointer;transition:all .15s;}
+.copy-btn:hover{border-color:var(--bl);color:var(--bl);}
+.copy-btn.copied{border-color:var(--gr);color:var(--gr);}
+/* AI annotation */
+.ai-note{font-style:italic;color:var(--mu);font-size:11px;padding:4px 0 0;}
+.ai-note::before{content:"✦ ";color:var(--dim);}
+
+/* ── View switcher ── */
+.view-switcher{display:flex;gap:0;border-bottom:1px solid var(--bd);background:var(--s0);padding:0 18px;}
+.vs-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--mu);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;}
+.vs-btn:hover{color:var(--tx);}
+.vs-btn.active{color:var(--bl);border-bottom-color:var(--bl);}
+
+/* ── PR badge on repo card ── */
+.pr-badge{display:inline-flex;align-items:center;gap:5px;background:#89b4fa12;border:1px solid #89b4fa33;border-radius:4px;padding:2px 8px;font-size:10px;color:var(--bl);font-weight:600;margin-left:4px;}
+.pr-badge .pr-num{font-family:var(--fm);}
+.pr-badge .pr-dot{width:5px;height:5px;border-radius:50%;background:var(--gr);flex-shrink:0;}
+.pr-badge .pr-dot.draft{background:var(--mu);}
+
+/* ── PR view ── */
+.pr-view{padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+.pr-card{background:var(--s0);border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
+.pr-card-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+.pr-number{font-family:var(--fm);font-size:14px;font-weight:700;color:var(--bl);}
+.pr-title{font-size:14px;font-weight:600;flex:1;}
+.pr-state{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.pr-state.open{background:#a6e3a118;color:var(--gr);border:1px solid #a6e3a138;}
+.pr-state.draft{background:#6c708618;color:var(--mu);border:1px solid #6c708638;}
+.pr-state.review{background:#f9e2af18;color:var(--ye);border:1px solid #f9e2af38;}
+.pr-locs{padding:6px 0;}
+.pr-loc{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+.pr-loc:last-child{border-bottom:none;}
+.pr-loc:hover{background:var(--s1);}
+.pr-loc-machine{font-size:12px;font-weight:600;color:var(--tx);}
+.pr-loc-sep{color:var(--dim);}
+.pr-loc-repo{font-family:var(--fm);font-size:12px;color:var(--ma);}
+.pr-loc-branch{font-family:var(--fm);font-size:10px;color:var(--mu);background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:1px 6px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pr-loc-sessions{font-size:10px;color:var(--mu);margin-left:auto;}
+.pr-loc-attn{font-size:10px;font-weight:700;color:var(--ye);}
+.pr-nav-btn{background:var(--s1);border:1px solid var(--bd);color:var(--bl);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;white-space:nowrap;margin-left:auto;}
+.pr-nav-btn:hover{border-color:var(--bl);}
+
+/* ── Highlight flash on navigate ── */
+@keyframes flash-highlight{0%{box-shadow:0 0 0 3px #89b4fa88;}60%{box-shadow:0 0 0 3px #89b4fa44;}100%{box-shadow:none;}}
+.repo-card.nav-highlight{animation:flash-highlight 1.8s ease-out forwards;}
+
+/* ── No results ── */
+.no-results{text-align:center;padding:40px;color:var(--mu);font-size:13px;}
+
+/* ── Responsive ── */
+@media(max-width:600px){.repos-grid{grid-template-columns:1fr;}.topbar{gap:8px;}}
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <h1>📦 DevBox Status</h1>
+  <div class="filters">
+    <div class="filter-group">
+      <label class="f-lbl" for="f-machine">Machine</label>
+      <!-- INJECT: machine <select> — one <option value="{hostname}">{hostname}</option> per distinct machine -->
+      <select id="f-machine" class="f-select f-machine-sel" onchange="applyFilters()">
+        <option value="">All machines</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="f-lbl" for="f-repo">Repo</label>
+      <!-- INJECT: repo <select> — one <option value="{name}">{name}</option> per distinct repo name -->
+      <select id="f-repo" class="f-select" onchange="applyFilters()">
+        <option value="">All repos</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="f-lbl" for="f-branch">Branch</label>
+      <input type="text" id="f-branch" class="f-input" placeholder="branch name…" oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label class="f-lbl" for="f-session">Session / PR #</label>
+      <input type="text" id="f-session" class="f-input" placeholder="session or PR #…" oninput="applyFilters()">
+    </div>
+    <button class="f-attn" id="f-attn" onclick="toggleAttn(this)">⚠ Needs Attention</button>
+    <button class="f-clear" onclick="clearFilters()">✕ Clear</button>
+  </div>
+  <!-- INJECT: <div class="topbar-meta">{dayName} {date} · {time} {tz} · {N} machines · next refresh {interval}s</div> -->
+</div>
+
+<!-- ── Summary strip ── -->
+<div class="sumstrip">
+  <!-- INJECT: summary cards — see SKILL.md for counts and colors -->
+  <!-- Required cards: Machines, Repos, Live Sessions, Needs Attention, Ad-hoc Sessions -->
+  <!-- Stale Machines card: always present but hidden (id="stale-scard", style="display:none") -->
+  <div class="scard" id="stale-scard" style="display:none">
+    <div class="v" id="stale-count" style="color:var(--rd)">0</div>
+    <div class="l" style="color:var(--rd)">Stale Machines</div>
+  </div>
+</div>
+
+<!-- ── Stale alert bar ── -->
+<div id="stale-bar" style="display:none;background:#f38ba812;border-bottom:1px solid #f38ba844;padding:7px 18px;font-size:12px;color:var(--rd);align-items:center;gap:8px;">
+  <span style="font-size:15px">🔴</span>
+  <strong id="stale-bar-text"></strong>
+  <span style="color:var(--mu)">— snapshot may be outdated. Check if devbox-monitor is still running on that machine.</span>
+</div>
+
+<!-- ── View switcher ── -->
+<div class="view-switcher">
+  <button id="vs-machines" class="vs-btn active" onclick="switchView('machines')">🖥 Machines</button>
+  <button id="vs-prs" class="vs-btn" onclick="switchView('prs')">⤴ Pull Requests</button>
+</div>
+
+<!-- ── Machines view ── -->
+<div class="content" id="main-content">
+
+  <!-- INJECT: one <details class="machine"> per snapshot file — see SKILL.md for full structure -->
+
+  <div class="no-results" id="no-results" style="display:none">No repos match the current filter.</div>
+
+</div>
+
+<!-- ── PR view ── -->
+<div id="view-prs" class="pr-view" style="display:none">
+
+  <!-- INJECT: one <div class="pr-card"> per PR from live query — see SKILL.md for structure -->
+  <!-- If no PRs: emit <div class="no-results"> with per-provider auth hints -->
+
+</div>
+
+<script>
+function computeStaleness() {
+  var now = new Date();
+  var WARN_MS  = 15 * 60 * 1000;  // 15 min → yellow
+  var STALE_MS = 30 * 60 * 1000;  // 30 min → red
+  var staleMachines = [];
+
+  document.querySelectorAll('details.machine[data-captured-at]').forEach(function(machine) {
+    var ts = new Date(machine.dataset.capturedAt);
+    var ageMs = now - ts;
+    var ageMin = Math.round(ageMs / 60000);
+    var pill = document.getElementById('snap-' + machine.dataset.machine);
+    if (!pill) return;
+
+    if (ageMs >= STALE_MS) {
+      pill.className = 'snap-pill snap-stale';
+      pill.textContent = '🔴 stale · ' + ageMin + 'm ago';
+      machine.style.outline = '2px solid #f38ba844';
+      staleMachines.push(machine.dataset.machine);
+    } else if (ageMs >= WARN_MS) {
+      pill.className = 'snap-pill snap-warn';
+      pill.textContent = '⚠ ' + ageMin + 'm ago';
+      machine.style.outline = '';
+    } else {
+      pill.className = 'snap-pill snap-ok';
+      pill.textContent = '✓ ' + (ageMin < 1 ? 'just now' : ageMin + 'm ago');
+      machine.style.outline = '';
+    }
+  });
+
+  var bar  = document.getElementById('stale-bar');
+  var scrd = document.getElementById('stale-scard');
+  var scnt = document.getElementById('stale-count');
+  if (staleMachines.length > 0) {
+    bar.style.display = 'flex';
+    scrd.style.display = '';
+    scnt.textContent = staleMachines.length;
+    document.getElementById('stale-bar-text').textContent =
+      staleMachines.join(', ') + (staleMachines.length === 1 ? ' has' : ' have') + ' not reported in over 30 minutes';
+  } else {
+    bar.style.display = 'none';
+    scrd.style.display = 'none';
+  }
+}
+
+computeStaleness();
+setInterval(computeStaleness, 30000);
+
+function copyId(id, btn) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(id).then(function() {
+      btn.textContent = '✓ copied';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = '📋 copy'; btn.classList.remove('copied'); }, 1800);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = id;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ copied';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = '📋 copy'; btn.classList.remove('copied'); }, 1800);
+  }
+}
+
+function switchView(view) {
+  document.getElementById('main-content').style.display = view === 'machines' ? '' : 'none';
+  document.getElementById('view-prs').style.display     = view === 'prs'      ? '' : 'none';
+  document.querySelectorAll('.vs-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('vs-' + view).classList.add('active');
+}
+
+function navigateToRepo(machine, repo) {
+  switchView('machines');
+  document.getElementById('f-machine').value = machine;
+  document.getElementById('f-repo').value = repo;
+  applyFilters();
+  setTimeout(function() {
+    document.querySelectorAll('details.machine[data-machine="' + machine + '"] .repo-card[data-repo="' + repo + '"]').forEach(function(card) {
+      card.scrollIntoView({behavior: 'smooth', block: 'center'});
+      card.classList.remove('nav-highlight');
+      void card.offsetWidth;
+      card.classList.add('nav-highlight');
+      setTimeout(function(){ card.classList.remove('nav-highlight'); }, 1800);
+    });
+  }, 120);
+}
+
+function applyFilters() {
+  var machine  = document.getElementById('f-machine').value;
+  var repo     = document.getElementById('f-repo').value;
+  var branch   = document.getElementById('f-branch').value.toLowerCase().trim();
+  var session  = document.getElementById('f-session').value.toLowerCase().trim();
+  var attnOnly = document.getElementById('f-attn').classList.contains('active');
+
+  var anyVisible = false;
+  document.querySelectorAll('details.machine').forEach(function(m) {
+    if (machine && m.dataset.machine !== machine) { m.style.display = 'none'; return; }
+    var anyCard = false;
+    m.querySelectorAll('.repo-card').forEach(function(card) {
+      var cardRepo   = card.dataset.repo || '';
+      var cardBranch = (card.dataset.branch || '').toLowerCase();
+      var cardText   = (card.dataset.searchtext || '').toLowerCase() + ' ' + card.textContent.toLowerCase();
+      var show = true;
+      if (repo    && cardRepo !== repo)            show = false;
+      if (branch  && !cardBranch.includes(branch)) show = false;
+      if (session && !cardText.includes(session))  show = false;
+      if (attnOnly && !card.querySelector('.attn-badge')) show = false;
+      card.style.display = show ? '' : 'none';
+      if (show) anyCard = true;
+    });
+    m.style.display = anyCard ? '' : 'none';
+    if (anyCard) anyVisible = true;
+  });
+  document.getElementById('no-results').style.display = anyVisible ? 'none' : '';
+}
+
+function clearFilters() {
+  document.getElementById('f-machine').value = '';
+  document.getElementById('f-repo').value = '';
+  document.getElementById('f-branch').value = '';
+  document.getElementById('f-session').value = '';
+  document.getElementById('f-attn').classList.remove('active');
+  applyFilters();
+}
+
+function toggleAttn(btn) {
+  btn.classList.toggle('active');
+  applyFilters();
+}
+</script>
+</body>
+</html>

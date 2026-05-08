@@ -31,6 +31,8 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **mcp-toggle** | Toggle MCP servers on/off in `.mcp.json` and manage `git skip-worktree`. |
 | **fresh-start** | Post-PR cleanup: verify PR merged, switch to main, delete branch, pull latest, install deps. |
 | **dotfiles-sync** | Set up, repair, and git-sync the dotfiles repository for Claude Code and Copilot config. |
+| **devbox-monitor** | Continuously monitor AI agent activity and repo health across configured repos on a timer. Writes JSON snapshots to a shared sync path. |
+| **devbox-report** | Read devbox status snapshots and generate a self-contained dark-mode HTML report, or answer natural-language queries about repo and agent state. |
 
 ## Usage
 
@@ -51,6 +53,12 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Sync my dotfiles"
 → dotfiles-sync activates
+
+"Monitor my repos" / "Start devbox monitor"
+→ devbox-monitor activates
+
+"Show devbox report" / "Which repos have uncommitted changes?"
+→ devbox-report activates
 ```
 
 ## Requirements
@@ -76,9 +84,17 @@ claude-skills-plugin/
 │   │   └── SKILL.md
 │   ├── fresh-start/             # Post-PR cleanup
 │   │   └── SKILL.md
-│   └── dotfiles-sync/           # Dotfiles repo management
-│       ├── SKILL.md
-│       └── reference/
+│   ├── dotfiles-sync/           # Dotfiles repo management
+│   │   ├── SKILL.md
+│   │   └── reference/
+│   ├── devbox-monitor/          # Multi-machine repo & agent monitor
+│   │   ├── SKILL.md
+│   │   └── devbox-snapshot.ps1
+│   ├── devbox-report/           # HTML dashboard & NL query reporter
+│   │   ├── SKILL.md
+│   │   └── references/
+│   └── _shared/                 # Shared data schema
+│       └── data-schema.md
 ├── README.md
 └── CHANGELOG.md
 ```
