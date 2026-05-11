@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-05-11
+
+### Added
+
+- `grill-me` skill — interview the user relentlessly about a plan or design until reaching shared understanding (adapted from [mattpocock/skills](https://github.com/mattpocock/skills))
+- `handoff` skill — compact the current conversation into a handoff document for another agent to pick up (adapted from [mattpocock/skills](https://github.com/mattpocock/skills))
+
 ## [1.0.0] - 2026-05-01
 
 ### Added

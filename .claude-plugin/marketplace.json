@@ -1,13 +1,13 @@
 {
   "name": "claude-skills",
-  "description": "Personal Claude Code skills: skill-creator, plugin-creator, forge, mcp-toggle, fresh-start, dotfiles-sync.",
+  "description": "Personal Claude Code skills: skill-creator, plugin-creator, forge, mcp-toggle, fresh-start, dotfiles-sync, grill-me, handoff.",
   "owner": {
     "name": "AbdouMoumen"
   },
   "plugins": [
     {
       "name": "claude-skills",
-      "description": "Personal Claude Code skills: skill-creator, plugin-creator, forge, mcp-toggle, fresh-start, dotfiles-sync.",
+      "description": "Personal Claude Code skills: skill-creator, plugin-creator, forge, mcp-toggle, fresh-start, dotfiles-sync, grill-me, handoff.",
       "source": "./",
       "version": "1.0.0",
       "author": {

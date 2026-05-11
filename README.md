@@ -33,6 +33,8 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **dotfiles-sync** | Set up, repair, and git-sync the dotfiles repository for Claude Code and Copilot config. |
 | **devbox-monitor** | Continuously monitor AI agent activity and repo health across configured repos on a timer. Writes JSON snapshots to a shared sync path. |
 | **devbox-report** | Read devbox status snapshots and generate a self-contained dark-mode HTML report, or answer natural-language queries about repo and agent state. |
+| **grill-me** | Interview the user relentlessly about a plan or design until reaching shared understanding. Walks each branch of the decision tree. |
+| **handoff** | Compact the current conversation into a handoff document for another agent to pick up. |
 
 ## Usage
 
@@ -59,6 +61,12 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Show devbox report" / "Which repos have uncommitted changes?"
 → devbox-report activates
+
+"Grill me on this plan" / "Stress-test my design"
+→ grill-me activates
+
+"Handoff" / "Pass this to another session"
+→ handoff activates
 ```
 
 ## Requirements
@@ -93,6 +101,10 @@ claude-skills-plugin/
 │   ├── devbox-report/           # HTML dashboard & NL query reporter
 │   │   ├── SKILL.md
 │   │   └── references/
+│   ├── grill-me/               # Stress-test plans & designs
+│   │   └── SKILL.md
+│   ├── handoff/                # Session handoff documents
+│   │   └── SKILL.md
 │   └── _shared/                 # Shared data schema
 │       └── data-schema.md
 ├── README.md
