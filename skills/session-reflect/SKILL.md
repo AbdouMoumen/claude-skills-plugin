@@ -83,22 +83,21 @@ Before proposing any finding (strong or medium):
 Present each strong finding as a proposal card:
 
 ```
-┌──────────────────────────────────────────────────────┐
-│ 📋 Proposal 1/N — [strong]                           │
-│ Bucket: <bucket> → <destination file>                 │
-│ Scope:  <repo | global>                               │
-│                                                       │
-│ When: <generalized condition>                         │
-│ Do:   <generalized action>                            │
-│                                                       │
-│ Evidence:                                              │
-│ • <specific turn/event from session>                  │
-│ • <additional evidence if available>                  │
-│                                                       │
-│ Pattern: <why this is a pattern, not a one-off>       │
-│                                                       │
-│ Apply? (yes / no / edit)                               │
-└──────────────────────────────────────────────────────┘
+---
+📋 **Proposal 1/N** · strong · `<bucket> → <destination file>` · <scope>
+
+**When:** <generalized condition>
+**Do:** <generalized action>
+
+**Evidence:**
+- <specific turn/event from session>
+- <additional evidence if available>
+
+**Pattern:** <why this is a pattern, not a one-off>
+
+**Apply?** (yes / no / edit / approve all / skip remaining)
+
+---
 ```
 
 Present proposals **one at a time**. Wait for user response before showing the next.
