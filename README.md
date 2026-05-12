@@ -4,14 +4,39 @@ A Claude Code plugin containing personal skills for productivity, prompt enginee
 
 ## Installation
 
+### Claude Code
+
+From inside a Claude Code session, run:
+
+```
+/plugin marketplace add AbdouMoumen/claude-skills-plugin
+/plugin install claude-skills
+```
+
+### Copilot CLI
+
+From inside a Copilot CLI session, run the same commands:
+
+```
+/plugin marketplace add AbdouMoumen/claude-skills-plugin
+/plugin install claude-skills
+```
+
+<details>
+<summary><strong>Manual / Development</strong></summary>
+
+Clone the repo and point your CLI at it:
+
 ```bash
 git clone https://github.com/AbdouMoumen/claude-skills-plugin.git ~/claude-skills-plugin
 ```
 
-Then launch Claude Code with the plugin:
+Then launch with the plugin directory:
 
 ```bash
 claude --plugin-dir ~/claude-skills-plugin
+# or
+copilot --plugin-dir ~/claude-skills-plugin
 ```
 
 Or add a permanent alias to your shell profile:
@@ -20,6 +45,8 @@ Or add a permanent alias to your shell profile:
 # ~/.bashrc or ~/.zshrc
 alias claude='claude --plugin-dir ~/claude-skills-plugin'
 ```
+
+</details>
 
 ## Skills
 
