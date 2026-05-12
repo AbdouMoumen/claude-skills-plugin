@@ -7,4 +7,24 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 
 Ask the questions one at a time.
 
-If a question can be answered by exploring the codebase, explore the codebase instead.
+If my response includes caveats, clarifications, or follow-up questions, stay on the current topic until I explicitly say to move on.
+
+If a question can be answered or a recommendation grounded by researching available sources (codebase, web, docs), do so instead of asking the user.
+
+## Decision Tracking
+
+Before asking the first question, create a table to track decisions throughout the session:
+
+```sql
+CREATE TABLE IF NOT EXISTS grill_decisions (
+  id TEXT PRIMARY KEY,
+  question TEXT NOT NULL,
+  recommendation TEXT,
+  resolution TEXT,
+  status TEXT DEFAULT 'resolved',
+  notes TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+After each resolved decision, INSERT a row with a descriptive kebab-case id. This data persists across compaction events and is available for downstream use (plans, PRDs, design docs, handoffs, etc.).
