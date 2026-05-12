@@ -10,7 +10,7 @@ From inside a Claude Code session, run:
 
 ```
 /plugin marketplace add AbdouMoumen/claude-skills-plugin
-/plugin install claude-skills
+/plugin install claude-skills@claude-skills
 ```
 
 ### Copilot CLI
@@ -19,7 +19,7 @@ From inside a Copilot CLI session, run the same commands:
 
 ```
 /plugin marketplace add AbdouMoumen/claude-skills-plugin
-/plugin install claude-skills
+/plugin install claude-skills@claude-skills
 ```
 
 <details>
