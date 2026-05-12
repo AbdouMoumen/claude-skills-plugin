@@ -138,6 +138,19 @@ When the user approves a proposal (yes or edited), apply it immediately. Use the
 
 After each apply, confirm to the user what was written and where.
 
+### Commit Applied Changes
+
+After all proposals (strong and promoted medium) are resolved, if any files were written:
+
+1. Show what was written — list the files created or modified during this reflect pass
+2. Prompt the user:
+   _"Commit N session learnings? Message: `chore: apply session learnings` (yes / no / edit)"_
+   - **yes** → stage the affected files and commit with the default message
+   - **no** → leave changes uncommitted (user may want to review, stash, or commit later)
+   - **edit** → let the user modify the commit message, then stage and commit
+
+If no proposals were applied, skip this step entirely.
+
 ---
 
 ## Clean Session

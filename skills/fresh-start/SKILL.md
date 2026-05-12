@@ -97,7 +97,45 @@ If `$PR_COMPLETED` is false, report: _"Kept branch `$BRANCH` (no completed PR co
 git pull
 ```
 
-### 8. Install dependencies (conditional)
+### 8. Clean up session artifacts (conditional)
+
+Scan the working directory for artifacts left by this or prior sessions. Classify each artifact, then present proposals grouped by category.
+
+#### Classification
+
+Use session context (conversation history, file creation events) and file characteristics to classify each artifact:
+
+| Category | Signals | Examples |
+|----------|---------|----------|
+| **Stale** | Transient coordination files, created by agent workflows, no long-term value | `handoff.md`, `plan.md`, scratch/temp files, debug logs |
+| **Review** | May have lasting value, user should decide | Generated docs, exported data, config drafts, scripts the user asked for |
+
+#### Proposal
+
+Present classified artifacts grouped by category:
+
+```
+🧹 Session artifacts found:
+
+  Stale (safe to delete):
+    • handoff.md (created this session)
+    • plan.md (created this session)
+
+  Worth reviewing (not auto-deleted):
+    • exported-data.csv (created this session — may want to keep)
+    • draft-config.yaml (from a prior session)
+```
+
+- **Stale artifacts** → offer batch deletion: _"Delete 2 stale artifacts? (yes / no / pick)"_
+  - **yes** → delete all stale artifacts
+  - **no** → keep everything
+  - **pick** → let the user choose which stale artifacts to delete
+- **Review artifacts** → mention only. Do not offer deletion. The user can explicitly ask to delete any of them.
+- Artifacts from prior sessions (not created this session) should be noted as such, regardless of category.
+
+Update the Summary block to include an `Artifacts: deleted N / flagged N for review` line.
+
+### 9. Install dependencies (conditional)
 
 Check if `rush.json` exists in the repo root:
 
@@ -118,5 +156,6 @@ After all steps, print a concise summary:
    PR: merged / not confirmed
    Deleted: yes / no
    Pulled: latest
+   Artifacts: deleted N / flagged N for review
    Deps: rush install / skipped
 ```
