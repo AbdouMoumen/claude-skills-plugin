@@ -4,22 +4,22 @@ A Claude Code plugin containing personal skills for productivity, prompt enginee
 
 ## Installation
 
-### Claude Code
-
-From inside a Claude Code session, run:
+From inside a **Claude Code** or **Copilot CLI** session:
 
 ```
 /plugin marketplace add AbdouMoumen/claude-skills-plugin
 /plugin install claude-skills@claude-skills
 ```
 
-### Copilot CLI
+Or from your terminal (outside a session):
 
-From inside a Copilot CLI session, run the same commands:
+```bash
+claude plugin marketplace add AbdouMoumen/claude-skills-plugin
+claude plugin install claude-skills@claude-skills
 
-```
-/plugin marketplace add AbdouMoumen/claude-skills-plugin
-/plugin install claude-skills@claude-skills
+# Copilot CLI equivalent
+copilot plugin marketplace add AbdouMoumen/claude-skills-plugin
+copilot plugin install claude-skills@claude-skills
 ```
 
 <details>
