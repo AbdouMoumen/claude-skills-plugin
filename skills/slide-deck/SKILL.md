@@ -1,12 +1,12 @@
 ---
 name: slide-deck
-description: "Create presentation slide decks from simplified Markdown, then export or host them using Marp or Slidev. Use when the user asks for slides, decks, presentations, Marp, or Slidev."
+description: "Create presentation slide decks from simplified Markdown, then export or host them with an appropriate markdown slide engine. Use when the user asks for slides, decks, presentations, or markdown-to-slide conversion."
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob
 ---
 
 # Slide Deck
 
-Create a slide deck from simplified markdown and choose the best engine (`Marp` or `Slidev`) based on delivery needs.
+Create a slide deck from simplified markdown and choose the best slide engine based on delivery needs.
 
 Use the research summary in `reference/research-report.md` when the user asks for tradeoffs, recommendations, or tooling decisions.
 
@@ -26,13 +26,13 @@ If unknown, ask clarifying questions before generating files.
 
 ### 2) Pick engine with a clear rule
 
-Default to **Marp** when the user wants:
+Default to a **lightweight static-slide engine** when the user wants:
 - Fast authoring in near-plain Markdown
 - Static HTML/PDF/PPTX export
 - Minimal tooling and predictable output
 
-Use **Slidev** when the user wants:
-- Interactive slides (Vue components, live demos)
+Use an **interactive slide framework** when the user wants:
+- Interactive slides (components, live demos)
 - Rich presenter/developer features
 - Hosted interactive SPA output
 
@@ -48,22 +48,13 @@ Keep source concise: one idea per slide.
 
 ### 4) Generate artifacts
 
-#### Marp path
+Use the selected toolchain's native commands to generate required outputs:
+- Static HTML
+- PDF
+- PPTX (if requested)
+- Hosted bundle (if requested)
 
-```bash
-npx @marp-team/marp-cli@latest slides.md -o slides.html
-npx @marp-team/marp-cli@latest slides.md --pdf -o slides.pdf
-npx @marp-team/marp-cli@latest slides.md --pptx -o slides.pptx
-```
-
-#### Slidev path
-
-```bash
-npm init slidev@latest
-slidev build
-slidev export --format pdf
-slidev export --format pptx
-```
+If the user explicitly names a tool, honor it unless constraints make it non-viable.
 
 ### 5) Return structured output
 
