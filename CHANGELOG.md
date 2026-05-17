@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `slide-deck` skill — create slide decks from simplified markdown with a Marp-first recommendation and Slidev escalation path, plus tool research report
+
 ## [1.1.0] - 2026-05-11
 
 ### Added

@@ -62,6 +62,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **devbox-report** | Read devbox status snapshots and generate a self-contained dark-mode HTML report, or answer natural-language queries about repo and agent state. |
 | **grill-me** | Interview the user relentlessly about a plan or design until reaching shared understanding. Walks each branch of the decision tree. |
 | **handoff** | Compact the current conversation into a handoff document for another agent to pick up. |
+| **slide-deck** | Create slide decks from simplified markdown using Marp (default) or Slidev (interactive mode), with export/hosting commands and clear tool-selection logic. |
 
 ## Usage
 
@@ -94,6 +95,9 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Handoff" / "Pass this to another session"
 → handoff activates
+
+"Create slides from this markdown" / "Marp or Slidev for this deck?"
+→ slide-deck activates
 ```
 
 ## Requirements
@@ -132,6 +136,9 @@ claude-skills-plugin/
 │   │   └── SKILL.md
 │   ├── handoff/                # Session handoff documents
 │   │   └── SKILL.md
+│   ├── slide-deck/             # Markdown slide deck generation (Marp/Slidev)
+│   │   ├── SKILL.md
+│   │   └── reference/
 │   └── _shared/                 # Shared data schema
 │       └── data-schema.md
 ├── README.md
