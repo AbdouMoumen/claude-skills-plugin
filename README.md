@@ -55,6 +55,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **skill-creator** | Guides Claude through creating new skills using a 5-phase process (discovery, scope, design, implement, validate). Model-invoked when you ask to create a skill. |
 | **plugin-creator** | Guides through creating Claude Code plugins with slash commands, skills, hooks, and MCP servers. |
 | **forge** | Craft, optimize, and review AI prompts using proven techniques. Supports create, evaluate, and compare workflows. |
+| **skill-review** | Review a skill against a 9-axis rubric and emit conversational, severity-tagged findings with suggested fixes. Model-invoked when you ask to review, audit, or critique a skill. |
 | **mcp-toggle** | Toggle MCP servers on/off in `.mcp.json` and manage `git skip-worktree`. |
 | **fresh-start** | Post-PR cleanup: verify PR merged, switch to main, delete branch, pull latest, install deps. |
 | **dotfiles-sync** | Set up, repair, and git-sync the dotfiles repository for Claude Code and Copilot config. |
@@ -73,6 +74,9 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Write me a system prompt for a code reviewer"
 → forge activates
+
+"Review the X skill" / "Audit this skill"
+→ skill-review activates
 
 "Fresh start" / "Next task"
 → fresh-start activates
@@ -113,6 +117,9 @@ claude-skills-plugin/
 │   ├── plugin-creator/          # Create distributable plugins
 │   │   └── SKILL.md
 │   ├── forge/                   # Prompt engineering
+│   │   ├── SKILL.md
+│   │   └── reference/
+│   ├── skill-review/            # Review skills against a 9-axis rubric
 │   │   ├── SKILL.md
 │   │   └── reference/
 │   ├── mcp-toggle/              # Toggle MCP servers

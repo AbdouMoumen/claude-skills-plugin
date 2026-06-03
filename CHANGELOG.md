@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-06-03
+
+### Added
+
+- `skill-review` skill — review a skill against a 9-axis rubric and emit conversational, severity-tagged findings with suggested fixes. Light mode (single subagent) for short or low-risk skills; thorough mode (general-purpose + rubber-duck in parallel) for skills that fire conditional axes. Calibration bank lives at `skills/skill-review/reference/examples.md`.
+- Design doc at `docs/skill-review-design.md` covering the rubric, mode selection, subagent contract, and merge rules.
+
 ## [1.1.0] - 2026-05-11
 
 ### Added
