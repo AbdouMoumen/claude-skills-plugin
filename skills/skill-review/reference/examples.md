@@ -276,3 +276,23 @@ Most initial seeds come from the `pr-watch` review that prompted this skill's de
 **Why it's a failure of axis 9:** The agent handles whichever signal won, then assumes the PR is in that state. The other signals still exist and would fire on the next poll — but the agent has already committed to a path.
 
 **Suggested fix:** Document the priority order. Tell the agent: "After handling any signal, relaunch the daemon — other pending signals may follow."
+
+---
+
+## Validation calibration (thorough mode classification)
+
+In thorough mode, each finding is classified as **behavioral** or **meta-evaluative** before validation (see SKILL.md Step 9). The validator runs only on behavioral findings; meta-evaluative findings skip validation and surface in the main report with `[validation N/A — meta-evaluative]`.
+
+### Behavioral — claim can be confirmed or falsified by a trace
+
+> The skill says: "After completing the fix, run `git push origin main`." A reviewer flags this as missing a safety gate.
+
+**Why behavioral:** a trace of an agent executing this skill would either show a `git push` command being issued (claim confirmed) or not (claim falsified). The validator can simulate this directly. Expected validator verdicts: `would-manifest` if the trace shows the push instruction reachable without a gate; `would-not-manifest` if the trace shows a flag or preflight check intervening.
+
+---
+
+### Meta-evaluative — claim is about evaluation standards, not behavior
+
+> The skill defines a `--fix` mode but says only "the agent should be careful". A reviewer flags this as insufficient guardrails.
+
+**Why meta-evaluative:** "Insufficient guardrails" is a quality judgment about the skill's prose, not a behavior a trace could falsify. The dismissal — "we accept `--fix` as the user's explicit consent" — lives in the meta-frame, not in any trace step. Skip validation; surface in the main report with `[validation N/A — meta-evaluative]`. The reviewer can still accept, dismiss, or escalate based on judgment.

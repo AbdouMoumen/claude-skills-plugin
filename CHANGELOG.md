@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2026-06-03
+
+### Changed
+
+- `skill-review` skill — added validation step (thorough mode only). Findings are now classified as behavioral or meta-evaluative; behavioral findings are validated by a fresh per-finding simulation subagent that returns a trinary verdict (`would-manifest` / `unsure` / `would-not-manifest`). Findings the validator finds unlikely surface in a separate **Possibly invalid** section (no severity demotion). The walkthrough now covers main findings first, then offers a second pass for possibly-invalid ones with the full validator trace alongside. Empirically validated across 12 subagent cells before shipping (8 real findings × 2 prompt variants, plus 4 synthetic controls). See `skills/skill-review/SKILL.md` Step 9 for the architecture.
+
 ## [1.2.0] - 2026-06-03
 
 ### Added

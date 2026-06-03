@@ -138,19 +138,71 @@ A subagent may return a finding with a missing merge-key, a vague fix, or wrong 
 - Wrong shape → reformat to the canonical per-finding shape.
 - Drop only if no actionable content survives salvage.
 
-### Step 9 — Render and write output
+### Step 9 — Validate behavioral findings (thorough mode only)
+
+Reviews surface real issues mixed with false positives. Validation runs a fresh simulation per behavioral finding to catch the easy false positives before the user sees them. Skip this step in light mode.
+
+**Classify each finding.** Ask: *Would a trace of an agent executing this skill either confirm or falsify the finding's claim?*
+
+- **Yes → behavioral.** Example: "Skill instructs `git push` to `origin/main`" → trace shows whether the push happens.
+- **No → meta-evaluative.** Example: "Axis 6 has vague guardrails for `--fix`" → no trace step disproves "vague"; the claim is about what we consider sufficient.
+
+Behavioral findings go through validation. Meta-evaluative findings skip validation; they reach the main report with a `[validation N/A — meta-evaluative]` tag.
+
+**Dispatch validators in parallel.** For each behavioral finding, spawn a fresh general-purpose subagent with this prompt:
+
+> Treat this as a hypothesis to test, not a fact to confirm. Both outcomes are equally valid.
+>
+> Your task: simulate how an AI agent would behave if it read this skill and tried to execute it. Construct a plausible scenario, walk through what the agent would do step-by-step, then assess whether the behavior described in the finding would actually occur.
+>
+> Do not read files, run commands, or modify anything outside this prompt. Reason only from the prompt content.
+>
+> Structure your response with three sections:
+> - **Scenario:** the concrete situation you're simulating (1-3 sentences)
+> - **Trace:** what the agent would do step-by-step (numbered steps)
+> - **Assessment:** whether the predicted behavior would occur, and why
+>
+> End your response with exactly one line: `VERDICT: would-manifest` OR `VERDICT: unsure` OR `VERDICT: would-not-manifest`.
+>
+> If you cannot construct a trace that would either confirm or falsify the claim (e.g., it's about evaluation standards or sufficiency rather than agent behavior), return `VERDICT: unsure` with reasoning beginning "Claim not behaviorally testable: ...". The main agent will re-route the finding.
+>
+> [SKILL CONTENT]
+> <paste the full target SKILL.md + any reference/scripts file content the finding cites>
+>
+> [FINDING TO VALIDATE]
+> <paste the canonical per-finding entry>
+
+Pass each validator only the one finding it's validating — no other findings, no calibration bank, no rubber-duck lens framing. Validators are isolated counterfactuals.
+
+**Sort findings by verdict.**
+
+| Source | Verdict | Destination |
+|---|---|---|
+| Meta-evaluative (skipped validation) | — | Main report, tag `[validation N/A — meta-evaluative]` |
+| Behavioral | `would-manifest` | Main report, tag `[validated: would-manifest]` |
+| Behavioral | `unsure` (without "not behaviorally testable" marker) | Main report, tag `[validated: unsure]` |
+| Behavioral | `unsure` with reasoning starting "Claim not behaviorally testable: ..." | **Re-bucket as meta-evaluative.** Main report, tag `[validation N/A — meta-evaluative]` |
+| Behavioral | `would-not-manifest` | Possibly invalid section. Keep original severity tag. Include full validator output. |
+
+Validator misclassification has two failure modes: meta-evaluative claims misclassified as behavioral (the escape-hatch row above catches these), and behavioral claims misclassified as meta-evaluative (silent miss — accept for now, monitor in real-world reviews).
+
+### Step 10 — Render and write output
 
 Reviews must survive context compaction — the user may come back hours or days later to act on findings. Output goes to two destinations with different shapes:
 
 1. **The persisted file** — the full report in the canonical shape (see §Output format below). Filename: `skill-review-<target-skill-name>-<YYYYMMDD>.md` in the session's persistent scratch directory. If that file already exists (e.g., a second review the same day), append `-HHMM` to avoid overwriting.
 
-2. **The chat** — start with a short summary (2-3 sentences: mode used, conditional axes fired, finding counts by severity) plus the resolved file path. Then offer to walk the user through findings one at a time. **Do not dump the full report into chat by default** — it produces a wall of text that's hard to act on.
+2. **The chat** — start with a short summary (2-3 sentences: mode used, conditional axes fired, finding counts by severity, and — in thorough mode — count of "possibly invalid" findings if non-zero) plus the resolved file path. Then offer to walk the user through findings one at a time. **Do not dump the full report into chat by default** — it produces a wall of text that's hard to act on.
 
-When the user accepts the walkthrough, go finding-by-finding in priority order: 🔴 → 🟠 → 🟡, and within each tier, convergent-from-both-lenses findings first, then singletons in source order. For each finding, paraphrase in plain language (what's wrong, why it matters, the suggested fix), then ask for a disposition (note / file issue / fix now / dismiss as false-positive / other). Confirm each disposition before moving to the next finding. At the end, append the dispositions to the persisted file so they survive compaction.
+When the user accepts the walkthrough, go finding-by-finding through **main findings first** in priority order: 🔴 → 🟠 → 🟡, and within each tier, convergent-from-both-lenses findings first, then singletons in source order. For each finding, paraphrase in plain language (what's wrong, why it matters, the suggested fix), then ask for a disposition (note / file issue / fix now / dismiss as false-positive / other). Confirm each disposition before moving to the next finding.
+
+After all main findings are walked, if there are possibly-invalid findings, offer a second walkthrough: *"Walk through M possibly-invalid findings? (y/n)"*. For each possibly-invalid finding, render the full validator output (Scenario / Trace / Assessment / VERDICT) alongside the finding itself so the user can sanity-check the simulation before deciding the disposition.
+
+At the end, append the dispositions to the persisted file so they survive compaction.
 
 ## Output format
 
-The structures below describe the **persisted file** (full report) and the **subagent return** (what each subagent emits). The **chat output** is summary-first and conversational per Step 9 — not described as a fixed template, because it adapts to the user's walkthrough cadence.
+The structures below describe the **persisted file** (full report) and the **subagent return** (what each subagent emits). The **chat output** is summary-first and conversational per Step 10 — not described as a fixed template, because it adapts to the user's walkthrough cadence.
 
 **Severity:**
 
@@ -161,14 +213,14 @@ The structures below describe the **persisted file** (full report) and the **sub
 **Per-finding shape:**
 
 ```
-[severity-emoji] [axis-N] <path:line-range>  [<source-tag>]
+[severity-emoji] [axis-N] <path:line-range>  [<source-tag>]  [<validation-tag>]
   what's wrong: <1 sentence>
   why it matters: <1 sentence>
   suggested fix: <1 sentence or short block>
 merge-key: <axis-N>::<relpath>::<anchor>
 ```
 
-The merge-key's anchor should survive wording differences across lenses — a quoted snippet from the source is usually the right choice. The main agent strips merge-key lines before rendering to chat. Source tags (`[gp]`, `[rd]`, `[gp + rd]`) are added by the main agent during Step 7 merge — subagents do not emit them.
+The merge-key's anchor should survive wording differences across lenses — a quoted snippet from the source is usually the right choice. The main agent strips merge-key lines before rendering to chat. Source tags (`[gp]`, `[rd]`, `[gp + rd]`) are added by the main agent during Step 7 merge — subagents do not emit them. Validation tags (`[validated: would-manifest]`, `[validated: unsure]`, `[validation N/A — meta-evaluative]`) are added by the main agent during Step 9; the validation tag is omitted in light mode and on findings routed to the **Possibly invalid** section (those have their own shape, below).
 
 **Subagent return shape** (each subagent returns this structure):
 
@@ -191,7 +243,9 @@ The main agent processes grilling questions per Step 5 — they do not appear in
 # skill-review — <target-skill-name>
 
 <2-3 sentence opener: mode used; conditional axes that fired; conditional axes
-suppressed or escalated and why.>
+suppressed or escalated and why. In thorough mode, mention the count of
+behavioral findings validated and the count routed to "Possibly invalid" if
+non-zero.>
 
 ## Findings
 
@@ -203,6 +257,18 @@ suppressed or escalated and why.>
 
 ### 🟡 Nits
 <findings>
+
+## Possibly invalid (thorough mode only — omit section entirely if empty)
+
+<each entry is a behavioral finding whose validator returned would-not-manifest.
+Keep the original per-finding shape (no severity demotion) and append the full
+validator output below it:>
+
+  validator output:
+    Scenario: <validator's scenario>
+    Trace: <validator's trace>
+    Assessment: <validator's assessment>
+    VERDICT: would-not-manifest
 
 ## Candidate example updates (optional)
 
