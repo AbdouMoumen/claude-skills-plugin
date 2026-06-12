@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `judgment-evidence` skill — capture moments of good user judgment (course-corrections, proactive design calls, bug catches, scope discipline, domain insight) into a personal append-only store. Hybrid detection: silent live capture mid-session plus an end-of-session sweep with unified review. Two-directory store: `~/.agents/` for the shareable main store + config, `~/.agents-local/` for the machine-local sidecar with verbatim text and paths — kept in a separate directory so it can't be accidentally synced when the main store is backed by a private repo or cloud-sync folder. Per-repo and per-cwd anonymization with deterministic 8-char repo hashes; **unknown repos default to anonymized** so safety doesn't depend on the user remembering to classify every new repo. Integrated as step 5 of `wrap-up`.
+
+### Changed
+
+- `CLAUDE.md` — replaced the single skill design bullet with three principles: WHAT over HOW, KISS, Progressive disclosure.
+- `wrap-up` skill — inserted step 5 to invoke `judgment-evidence` between `session-reflect` and `handoff`.
+
 ## [1.3.0] - 2026-06-03
 
 ### Changed
