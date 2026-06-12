@@ -63,6 +63,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **devbox-report** | Read devbox status snapshots and generate a self-contained dark-mode HTML report, or answer natural-language queries about repo and agent state. |
 | **grill-me** | Interview the user relentlessly about a plan or design until reaching shared understanding. Walks each branch of the decision tree. |
 | **handoff** | Compact the current conversation into a handoff document for another agent to pick up. |
+| **judgment-evidence** | Capture moments of good user judgment to a personal append-only store. Silent live capture during a session + end-of-session review sweep. Main store at `~/.agents/` (shareable), machine-local sidecar at `~/.agents-local/` (verbatim text + paths, kept in a separate directory so it can't be accidentally synced). Per-repo anonymization with deterministic repo hashes; unknown repos default to anonymized. |
 
 ## Usage
 
@@ -98,6 +99,9 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Handoff" / "Pass this to another session"
 → handoff activates
+
+"Capture judgment" / "Review judgment from this session"
+→ judgment-evidence activates (also fires silently when you push back on the agent, catch a bug, or cut scope)
 ```
 
 ## Requirements
@@ -139,6 +143,9 @@ claude-skills-plugin/
 │   │   └── SKILL.md
 │   ├── handoff/                # Session handoff documents
 │   │   └── SKILL.md
+│   ├── judgment-evidence/       # Capture good-judgment moments to ~/.agents/
+│   │   ├── SKILL.md
+│   │   └── reference/
 │   └── _shared/                 # Shared data schema
 │       └── data-schema.md
 ├── README.md

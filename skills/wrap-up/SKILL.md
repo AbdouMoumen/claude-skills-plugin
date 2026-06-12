@@ -58,15 +58,21 @@ Always invoke the **`session-reflect`** skill — no parameters needed, it analy
 
 Wait for `session-reflect` to complete (all proposals resolved or clean session confirmed) before continuing.
 
-### 5. Handoff (conditional)
+### 5. Invoke Judgment Evidence
+
+Always invoke the **`judgment-evidence`** skill — no parameters needed, it sweeps the session and surfaces a unified review of any live-captured plus newly-detected judgment moments. The skill self-handles first-run consent, clean-session ("no judgment to capture") cases, and its own anti-fabrication discipline.
+
+This runs **after** session-reflect because reflect's accepted proposals are themselves a useful signal for the sweep (the user agreed something is a pattern). Wait for `judgment-evidence` to complete (review resolved or clean session confirmed) before continuing.
+
+### 6. Handoff (conditional)
 
 If unfinished work was detected in step 2, tell the user what you found and ask if they'd like to create a handoff:
 - **Yes** → invoke the **`handoff`** skill. The handoff document is transient and should **not** be committed.
 - **No** → skip
 
-Handoff runs last because it captures the most complete picture — including which learnings were applied by session-reflect.
+Handoff runs last because it captures the most complete picture — including which learnings were applied by session-reflect and which judgment moments were just logged.
 
-### 6. Closing
+### 7. Closing
 
 ```
 ✅ Session wrapped up. Anything else before we close?
