@@ -57,6 +57,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **forge** | Craft, optimize, and review AI prompts using proven techniques. Supports create, evaluate, and compare workflows. |
 | **skill-review** | Review a skill against a 9-axis rubric and emit conversational, severity-tagged findings with suggested fixes. Model-invoked when you ask to review, audit, or critique a skill. |
 | **mcp-toggle** | Toggle MCP servers on/off in `.mcp.json` and manage `git skip-worktree`. |
+| **plugin-updater** | Detect installed plugins across Claude Code and Copilot CLI, update them, and self-maintain a platform playbook when plugin APIs/commands change. |
 | **fresh-start** | Post-PR cleanup: verify PR merged, switch to main, delete branch, pull latest, install deps. |
 | **dotfiles-sync** | Set up, repair, and git-sync the dotfiles repository for Claude Code and Copilot config. |
 | **devbox-monitor** | Continuously monitor AI agent activity and repo health across configured repos on a timer. Writes JSON snapshots to a shared sync path. |
@@ -84,6 +85,9 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Toggle my MCP servers"
 → mcp-toggle activates
+
+"Update my plugins across Claude and Copilot" / "List and update installed plugins"
+→ plugin-updater activates
 
 "Sync my dotfiles"
 → dotfiles-sync activates
@@ -128,6 +132,9 @@ claude-skills-plugin/
 │   │   └── reference/
 │   ├── mcp-toggle/              # Toggle MCP servers
 │   │   └── SKILL.md
+│   ├── plugin-updater/          # Plugin inventory + update with self-learning playbook
+│   │   ├── SKILL.md
+│   │   └── reference/
 │   ├── fresh-start/             # Post-PR cleanup
 │   │   └── SKILL.md
 │   ├── dotfiles-sync/           # Dotfiles repo management
