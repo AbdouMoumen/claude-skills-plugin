@@ -56,6 +56,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **plugin-creator** | Guides through creating Claude Code plugins with slash commands, skills, hooks, and MCP servers. |
 | **forge** | Craft, optimize, and review AI prompts using proven techniques. Supports create, evaluate, and compare workflows. |
 | **skill-review** | Review a skill against a 9-axis rubric and emit conversational, severity-tagged findings with suggested fixes. Model-invoked when you ask to review, audit, or critique a skill. |
+| **skill-distill** | Make an existing skill leaner while preserving required outcomes. Removes instruction bloat and uses `skill-eval` for user-approved comparisons of behavior and loaded context. |
 | **change-walkthrough** | Guide a read-only, interactive walkthrough of local changes or a pull request, including closed or merged PRs, one section at a time with revision-aware code links. |
 | **mcp-toggle** | Toggle MCP servers on/off in `.mcp.json` and manage `git skip-worktree`. |
 | **plugin-updater** | Detect installed plugins across Claude Code and Copilot CLI, update them, and self-maintain a platform playbook when plugin APIs/commands change. |
@@ -80,6 +81,9 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 
 "Review the X skill" / "Audit this skill"
 → skill-review activates
+
+"Make this skill leaner" / "Distill the X skill"
+→ skill-distill activates
 
 "Walk me through this PR" / "Explain my local changes one section at a time"
 → change-walkthrough activates
@@ -134,6 +138,8 @@ claude-skills-plugin/
 │   ├── skill-review/            # Review skills against a 9-axis rubric
 │   │   ├── SKILL.md
 │   │   └── reference/
+│   ├── skill-distill/           # Reduce instruction bloat without losing required outcomes
+│   │   └── SKILL.md
 │   ├── change-walkthrough/      # Interactive changeset and PR walkthroughs
 │   │   ├── SKILL.md
 │   │   └── references/

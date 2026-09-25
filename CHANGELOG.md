@@ -4,6 +4,7 @@
 
 ### Added
 
+- `skill-distill` skill — make existing skills leaner by preserving required outcomes, removing unnecessary instructions, and reusing `skill-eval` for user-approved behavioral comparisons with versioned evidence.
 - `change-walkthrough` skill — read-only, interactive walkthroughs of local changes and active or historical pull requests, with one-section-at-a-time navigation, revision-aware diff links, and an Azure DevOps comparison reference.
 - `plugin-updater` skill — detect installed plugins across Claude Code and Copilot CLI, update them, and maintain a self-learning platform playbook at `skills/plugin-updater/reference/platform-playbook.md` when plugin list/update APIs change.
 - `judgment-evidence` skill — capture moments of good user judgment (course-corrections, proactive design calls, bug catches, scope discipline, domain insight) into a personal append-only store. Hybrid detection: silent live capture mid-session plus an end-of-session sweep with unified review. Two-directory store: `~/.agents/` for the shareable main store + config, `~/.agents-local/` for the machine-local sidecar with verbatim text and paths — kept in a separate directory so it can't be accidentally synced when the main store is backed by a private repo or cloud-sync folder. Per-repo and per-cwd anonymization with deterministic 8-char repo hashes; **unknown repos default to anonymized** so safety doesn't depend on the user remembering to classify every new repo. Integrated as step 5 of `wrap-up`.
