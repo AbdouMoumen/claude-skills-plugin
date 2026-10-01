@@ -8,7 +8,7 @@ body {
   line-height: var(--leading-body-medium, 20px);
 }
 h1 { font-size: 16px; font-weight: var(--font-weight-semibold, 600); margin: 0 0 2px; }
-.sub, .meta, .id, .grip, .empty, summary { color: var(--text-color-muted, #656d76); }
+.sub, .meta, .id, .grip, .empty, .when, summary { color: var(--text-color-muted, #656d76); }
 .sub { font-size: 12px; margin-bottom: 10px; }
 form { display: flex; gap: 6px; margin-bottom: 10px; }
 input[type=text], textarea, button {
@@ -32,6 +32,7 @@ li.over { border-top: 2px solid var(--color-focus-outline, #0969da); }
 .id { font-family: var(--font-mono, monospace); font-size: 12px; padding-top: 1px; }
 .badge { font-size: 11px; padding: 0 6px; border-radius: 10px; margin-left: 4px; white-space: nowrap; }
 .badge.wip { background: var(--true-color-blue-muted, #ddf4ff); color: var(--true-color-blue, #0969da); }
+.when { display: inline-block; font-size: 11px; margin-left: 6px; white-space: nowrap; cursor: default; }
 li.done .text { text-decoration: line-through; color: var(--text-color-muted, #656d76); }
 input[type=checkbox] { margin-top: 3px; }
 .empty { padding: 12px 4px; }
