@@ -4,6 +4,10 @@
 
 ## [1.5.0] - 2026-10-01
 
+### Added
+
+- Parking Lot panel: a ✎ Edit hover button on each row, next to ▶ / ⚡ / ✕. It does the same thing as double-clicking the text, which still works.
+
 ### Changed
 
 - Parking Lot is now its own Copilot-only plugin, `parking-lot` (1.0.0), at `plugins/parking-lot/` with a legacy `.plugin/plugin.json` that declares `"extensions": "./extensions"`. The extension moved to `plugins/parking-lot/extensions/parking-lot/`; its code is unchanged.

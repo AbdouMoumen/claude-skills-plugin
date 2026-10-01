@@ -13,7 +13,7 @@ The agent has no tool for deleting or rewording items; you do that in the panel.
 
 Say "show the parking lot" to open the panel. You can refer to items by number in chat: "do #3", or "grab the next one" for the topmost open item.
 
-Each open item in the panel has two send buttons. **▶ Queue** sends "Work on Parking Lot #n: …" to the agent after its current work finishes. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`.
+Each open item in the panel has two send buttons. **▶ Queue** sends "Work on Parking Lot #n: …" to the agent after its current work finishes. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`. To edit an item's text or notes, hover the row and click **✎ Edit**, or double-click the text.
 
 ## Data
 Stored in `<session workspace>/files/parking-lot.json`: one list per session, removed along with the session.

@@ -82,6 +82,9 @@ function row(item) {
       el("button", { className: "icon", textContent: "⚡", title: "Send to the agent now (steer)", onclick: () => api("send", { id: item.id, mode: "immediate" }) }),
     );
   }
+  if (editing !== item.id) {
+    li.append(el("button", { className: "icon", textContent: "✎", title: "Edit", onclick: () => { editing = item.id; render(); } }));
+  }
   const del = el("button", { className: "icon", textContent: "✕", title: "Delete" });
   del.addEventListener("click", () => { if (confirm(`Delete #${item.id}?`)) api("delete", { id: item.id }); });
   li.append(del);
