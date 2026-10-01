@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Parking Lot</title>
+  <link rel="stylesheet" href="/ui.css" />
+</head>
+<body>
+  <h1>🅿️ Parking Lot</h1>
+  <div class="sub">Ideas for later. The agent won't act on these unless you ask.</div>
+  <form id="add">
+    <input id="text" type="text" placeholder="Park an idea… (Enter to add)" autocomplete="off" />
+    <button type="submit">Add</button>
+  </form>
+  <ul id="open"></ul>
+  <details id="doneWrap">
+    <summary><span id="doneLabel">Done (0)</span><button id="clear" type="button">Clear done</button></summary>
+    <ul id="done"></ul>
+  </details>
+  <script src="/ui.js"></script>
+</body>
+</html>

@@ -2,7 +2,12 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-01
+
 ### Added
+
+- `parking-lot` canvas extension (GitHub Copilot app only; Claude Code ignores it). It is a per-session backlog panel with `parking_add` / `parking_list` / `parking_update` tools and ships at `extensions/parking-lot/`.
+- `.plugin/plugin.json`, a Copilot-only legacy manifest that Copilot reads before `.claude-plugin/plugin.json`. It adds `"extensions": "./extensions"`, which Claude Code's manifest validation rejects (`Unrecognized key`).
 
 - `skill-distill` skill — make existing skills leaner by preserving required outcomes, removing unnecessary instructions, and reusing `skill-eval` for user-approved behavioral comparisons with versioned evidence.
 - `change-walkthrough` skill — read-only, interactive walkthroughs of local changes and active or historical pull requests, with one-section-at-a-time navigation, revision-aware diff links, and an Azure DevOps comparison reference.
@@ -13,6 +18,7 @@
 
 - `CLAUDE.md` — replaced the single skill design bullet with three principles: WHAT over HOW, KISS, Progressive disclosure.
 - `wrap-up` skill — inserted step 5 to invoke `judgment-evidence` between `session-reflect` and `handoff`.
+- Plugin manifests: version bumped to 1.4.0 and the description now mentions the Parking Lot canvas.
 
 ## [1.3.0] - 2026-06-03
 
