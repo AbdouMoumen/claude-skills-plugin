@@ -14,7 +14,7 @@
 - Parking Lot is now its own Copilot-only plugin, `parking-lot` (1.0.0), at `plugins/parking-lot/` with a legacy `.plugin/plugin.json` that declares `"extensions": "./extensions"`. The extension moved to `plugins/parking-lot/extensions/parking-lot/`; its code is unchanged.
 - Copilot discovers `parking-lot` through `.plugin/marketplace.json`, a Copilot-only marketplace manifest listing both plugins that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace still lists only `claude-skills`.
 - `claude-skills` description no longer mentions Parking Lot.
-- Parking Lot ▶ / ⚡ buttons now send `/parking-lot work <n> — <item text>`, then `Notes: …` if the item has notes, then `(Use the parking-lot skill.)`. Extension-sent prompts deliver slash commands as plain text (verified), so the last line points the agent at the skill.
+- Parking Lot ▶ / ⚡ buttons now send `/parking-lot work <n> — <item text>`, with `Notes: …` on the next line if the item has notes. Extension-sent prompts deliver slash commands as plain text (verified), so the skill is matched from its description.
 
 ### Removed
 

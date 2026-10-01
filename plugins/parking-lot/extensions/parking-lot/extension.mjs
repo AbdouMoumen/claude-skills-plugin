@@ -90,13 +90,13 @@ const tools = [
 ];
 
 // Panel "Queue" / "Now" buttons: hand an item to the agent as a user message.
-// session.send delivers slash commands as plain text (verified), so the
-// /parking-lot shorthand is followed by an explicit pointer to the skill.
+// session.send delivers slash commands as plain text (verified); the parking-lot
+// skill recognizes the "/parking-lot work <n>" shorthand by its description.
 async function sendToAgent({ id, mode }) {
     const item = await getStore().setStatus({ id, status: "in_progress", by: "user" });
     const notes = item.notes ? `\nNotes: ${item.notes}` : "";
     await session.send({
-        prompt: `/parking-lot work ${item.id} — ${item.text}${notes}\n(Use the parking-lot skill.)`,
+        prompt: `/parking-lot work ${item.id} — ${item.text}${notes}`,
         mode,
     });
     return item;
