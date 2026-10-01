@@ -6,6 +6,7 @@
 
 ### Added
 
+- `parking-lot` skill in the `parking-lot` plugin (`plugins/parking-lot/skills/parking-lot/`). `/parking-lot` opens the canvas, `/parking-lot <text>` parks an item, and `/parking-lot work <n>` works an item through to `done` with a completion note.
 - Parking Lot panel: a ✎ Edit hover button on each row, next to ▶ / ⚡ / ✕. It does the same thing as double-clicking the text, which still works.
 
 ### Changed
@@ -13,6 +14,7 @@
 - Parking Lot is now its own Copilot-only plugin, `parking-lot` (1.0.0), at `plugins/parking-lot/` with a legacy `.plugin/plugin.json` that declares `"extensions": "./extensions"`. The extension moved to `plugins/parking-lot/extensions/parking-lot/`; its code is unchanged.
 - Copilot discovers `parking-lot` through `.plugin/marketplace.json`, a Copilot-only marketplace manifest listing both plugins that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace still lists only `claude-skills`.
 - `claude-skills` description no longer mentions Parking Lot.
+- Parking Lot ▶ / ⚡ buttons now send "Use the parking-lot skill to work on Parking Lot #n:", with the item text and notes on the following lines.
 
 ### Removed
 

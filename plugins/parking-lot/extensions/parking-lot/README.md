@@ -11,9 +11,9 @@ A per-session backlog canvas for the GitHub Copilot app. Use it to park ideas yo
 
 The agent has no tool for deleting or rewording items; you do that in the panel. On each prompt, a hook gives the agent up to 10 open items, labeled "do NOT act unless asked".
 
-Say "show the parking lot" to open the panel. You can refer to items by number in chat: "do #3", or "grab the next one" for the topmost open item.
+Say "show the parking lot" or run `/parking-lot` to open the panel. `/parking-lot <text>` parks an item. You can refer to items by number in chat: "do #3", or "grab the next one" for the topmost open item. The plugin's `parking-lot` skill (`plugins/parking-lot/skills/parking-lot/SKILL.md`) handles these and the work flow below.
 
-Each open item in the panel has two send buttons. **▶ Queue** sends "Work on Parking Lot #n: …" to the agent after its current work finishes. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`. To edit an item's text or notes, hover the row and click **✎ Edit**, or double-click the text.
+Each open item in the panel has two send buttons. **▶ Queue** sends "Use the parking-lot skill to work on Parking Lot #n:" to the agent after its current work finishes, with the item text and notes on the following lines. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`. With the skill, the agent marks the item `done` with a completion note when it finishes. For questions or decisions, it checks with you before marking them done. The prompt is plain text rather than `/parking-lot work <n>` because the SDK doesn't document slash-command expansion for extension-sent prompts. To edit an item's text or notes, hover the row and click **✎ Edit**, or double-click the text. an item's text or notes, hover the row and click **✎ Edit**, or double-click the text.
 
 ## Data
 Stored in `<session workspace>/files/parking-lot.json`: one list per session, removed along with the session.

@@ -90,11 +90,12 @@ const tools = [
 ];
 
 // Panel "Queue" / "Now" buttons: hand an item to the agent as a user message.
+// Plain text, not `/parking-lot work <n>`: SDK docs don't confirm session.send expands slash commands.
 async function sendToAgent({ id, mode }) {
     const item = await getStore().setStatus({ id, status: "in_progress", by: "user" });
     const notes = item.notes ? `\nNotes: ${item.notes}` : "";
     await session.send({
-        prompt: `Work on Parking Lot #${item.id}: ${item.text}${notes}`,
+        prompt: `Use the parking-lot skill to work on Parking Lot #${item.id}:\n${item.text}${notes}`,
         mode,
     });
     return item;
