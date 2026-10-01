@@ -8,5 +8,6 @@
   "homepage": "https://github.com/AbdouMoumen/claude-skills-plugin",
   "repository": "https://github.com/AbdouMoumen/claude-skills-plugin",
   "license": "MIT",
+  "extensions": "./extensions",
   "keywords": ["skills", "productivity", "dotfiles", "prompt-engineering", "workflow", "devbox", "monitoring", "judgment"]
 }

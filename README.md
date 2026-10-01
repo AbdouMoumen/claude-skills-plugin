@@ -68,6 +68,14 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **handoff** | Compact the current conversation into a handoff document for another agent to pick up. |
 | **judgment-evidence** | Capture moments of good user judgment to a personal append-only store. Silent live capture during a session + end-of-session review sweep. Main store at `~/.agents/` (shareable), machine-local sidecar at `~/.agents-local/` (verbatim text + paths, kept in a separate directory so it can't be accidentally synced). Per-repo anonymization with deterministic repo hashes; unknown repos default to anonymized. |
 
+## Extensions (GitHub Copilot app only)
+
+| Extension | Description |
+|-----------|-------------|
+| **parking-lot** | 🅿️ A per-session backlog canvas. Park ideas for later; the agent sees them each turn but only acts when asked. See [`extensions/parking-lot/README.md`](extensions/parking-lot/README.md). |
+
+Extensions load only in the GitHub Copilot app. Claude Code ignores them. Copilot discovers them through `.plugin/plugin.json`, a Copilot-only manifest that Copilot reads before `.claude-plugin/plugin.json`. The `extensions` key lives only in `.plugin/plugin.json` because Claude Code's manifest validation rejects it. Keep the two manifests in sync.
+
 ## Usage
 
 Skills are **model-invoked** — Claude automatically uses them based on context. Just talk naturally:
@@ -125,7 +133,12 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 ```
 claude-skills-plugin/
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest
+│   ├── plugin.json              # Plugin manifest (Claude Code; Copilot fallback)
+│   └── marketplace.json
+├── .plugin/
+│   └── plugin.json              # Copilot-only manifest (adds "extensions"); keep in sync
+├── extensions/
+│   └── parking-lot/             # Copilot app canvas extension
 ├── skills/
 │   ├── skill-creator/           # Meta-skill for creating skills
 │   │   ├── SKILL.md
