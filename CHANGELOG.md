@@ -6,7 +6,7 @@
 
 ### Added
 
-- `parking-lot` skill in the `parking-lot` plugin (`plugins/parking-lot/skills/parking-lot/`). `/parking-lot` opens the canvas, `/parking-lot <text>` parks an item, and `/parking-lot work <n>` works an item through to `done` with a completion note.
+- `parking-lot` skill in the `parking-lot` plugin (`plugins/parking-lot/skills/parking-lot/`). `/parking-lot` (or `open`) opens the canvas, `list` shows open items, `next` shows the topmost item and asks before starting it, `work <n>` works an item through to `done` with a completion note, and `/parking-lot <text>` parks an item. Natural-language equivalents ("what's next", "do #3") count as commands, not new items.
 - Parking Lot panel: a ✎ Edit hover button on each row, next to ▶ / ⚡ / ✕. It does the same thing as double-clicking the text, which still works.
 
 ### Changed
