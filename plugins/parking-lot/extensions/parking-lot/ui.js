@@ -52,6 +52,32 @@ function editor(item) {
       el("button", { textContent: "Cancel", onclick: cancel })));
 }
 
+const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto", style: "narrow" });
+const UNITS = [["year", 31536000], ["month", 2592000], ["week", 604800], ["day", 86400], ["hour", 3600], ["minute", 60]];
+
+function relTime(iso) {
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return null;
+  const secs = (t - Date.now()) / 1000;
+  for (const [unit, size] of UNITS) {
+    if (Math.abs(secs) >= size) return rtf.format(Math.round(secs / size), unit);
+  }
+  return rtf.format(0, "second");
+}
+
+function stamp(item) {
+  const done = item.status === "done";
+  const iso = done ? item.completedAt : item.createdAt;
+  const rel = iso && relTime(iso);
+  if (!rel) return null;
+  return el("span", { className: "when", textContent: (done ? "done " : "added ") + rel, title: new Date(iso).toLocaleString() });
+}
+
+function completedTime(item) {
+  const t = item.completedAt ? Date.parse(item.completedAt) : NaN;
+  return Number.isNaN(t) ? -Infinity : t;
+}
+
 function display(item) {
   const done = item.status === "done";
   const wrap = el("div");
@@ -59,6 +85,8 @@ function display(item) {
   if (item.addedBy === "agent") text.append(el("span", { className: "badge", textContent: "🤖", title: "Added by agent" }));
   if (item.status === "in_progress") text.append(el("span", { className: "badge wip", textContent: "in progress" }));
   if (done && item.completedBy === "agent") text.append(el("span", { className: "badge", textContent: "🤖✓", title: "Completed by agent" }));
+  const when = stamp(item);
+  if (when) text.append(when);
   text.addEventListener("dblclick", () => { editing = item.id; render(); });
   wrap.append(text);
   if (item.notes) wrap.append(el("div", { className: "meta", textContent: item.notes }));
@@ -93,7 +121,11 @@ function row(item) {
 
 function render() {
   const open = state.items.filter((i) => i.status !== "done");
-  const done = state.items.filter((i) => i.status === "done");
+  const done = state.items.filter((i) => i.status === "done")
+    .sort((a, b) => {
+      const ta = completedTime(a), tb = completedTime(b);
+      return ta === tb ? 0 : tb > ta ? 1 : -1;
+    });
   $("open").replaceChildren(...(open.length ? open.map(row) : [el("li", { className: "empty", textContent: "Nothing parked yet." })]));
   $("done").replaceChildren(...done.map(row));
   $("doneLabel").textContent = `Done (${done.length})`;
@@ -118,4 +150,5 @@ events.onmessage = (e) => {
   state = JSON.parse(e.data);
   if (editing == null) render();
 };
+setInterval(() => { if (editing == null && dragId == null) render(); }, 60000);
 render();

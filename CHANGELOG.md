@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Parking Lot panel (`parking-lot` 1.1.0): each row shows a muted relative time, `added 3d ago` for open items and `done 2h ago` for done items, with the full local date/time in a tooltip. Uses the existing `createdAt` / `completedAt` fields; no data format change.
+
+### Changed
+
+- Parking Lot panel: done items are sorted by completion time, most recent first (items without `completedAt` last). Open items keep their manual drag order.
+
 ## [1.5.0] - 2026-10-01
 
 ### Added
