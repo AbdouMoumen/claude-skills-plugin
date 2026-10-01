@@ -8,4 +8,5 @@
 
 ## Plugin Manifests
 
-- `.plugin/plugin.json` (Copilot CLI/app; read first) and `.claude-plugin/plugin.json` (Claude Code) must stay in sync: name, description, version, and other metadata. The only difference is that `.plugin/plugin.json` has `"extensions"`, which Claude Code's validator rejects. Keep `.plugin/plugin.json` a legacy manifest (no `$schema`). Also keep the version and description in `.claude-plugin/marketplace.json` in sync.
+- `claude-skills` has one manifest, `.claude-plugin/plugin.json`. Keep its version and description in sync with its entries in `.claude-plugin/marketplace.json` (Claude Code) and `.plugin/marketplace.json` (Copilot; read first).
+- `parking-lot` is Copilot-only: `plugins/parking-lot/.plugin/plugin.json` (legacy manifest, no `$schema`; has `"extensions"`, which Claude Code rejects). List it only in `.plugin/marketplace.json`.

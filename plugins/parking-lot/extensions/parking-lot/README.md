@@ -11,9 +11,9 @@ A per-session backlog canvas for the GitHub Copilot app. Use it to park ideas yo
 
 The agent has no tool for deleting or rewording items; you do that in the panel. On each prompt, a hook gives the agent up to 10 open items, labeled "do NOT act unless asked".
 
-Say "show the parking lot" to open the panel. You can refer to items by number in chat: "do #3", or "grab the next one" for the topmost open item.
+Say "show the parking lot" or run `/parking-lot` (or `/parking-lot open`) to open the panel. `/parking-lot list` shows open items, `/parking-lot next` shows the topmost one and asks before starting it, `/parking-lot work <n>` works an item, and `/parking-lot <text>` parks a new one. Natural phrasing works too: "what's next", "do #3". The plugin's `parking-lot` skill (`plugins/parking-lot/skills/parking-lot/SKILL.md`) handles all of these. It treats text as a new item only when it reads like an idea or task, and asks if it's unsure.
 
-Each open item in the panel has two send buttons. **▶ Queue** sends "Work on Parking Lot #n: …" to the agent after its current work finishes. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`.
+Each open item in the panel has two send buttons. **▶ Queue** sends `/parking-lot work <n> — <item text>` to the agent after its current work finishes, with `Notes: …` on the next line if the item has notes. **⚡ Now** steers the agent immediately. Both mark the item `in_progress`. With the skill, the agent marks the item `done` with a completion note when it finishes. For questions or decisions, it checks with you before marking them done. Extension-sent prompts deliver slash commands as plain text, so the agent picks up the skill from its description rather than from slash-command expansion. To edit an item's text or notes, hover the row and click **✎ Edit**, or double-click the text. an item's text or notes, hover the row and click **✎ Edit**, or double-click the text.
 
 ## Data
 Stored in `<session workspace>/files/parking-lot.json`: one list per session, removed along with the session.
@@ -31,15 +31,17 @@ Stored in `<session workspace>/files/parking-lot.json`: one list per session, re
 
 ### 1. Install
 Choose one:
-- **As part of the `claude-skills` plugin** (recommended): install or update the plugin, then ask Copilot to "reload extensions" or start a new session.
+- **As the `parking-lot` plugin** (recommended): install the plugin, then ask Copilot to "reload extensions" or start a new session.
   ```bash
   copilot plugin marketplace add AbdouMoumen/claude-skills-plugin
-  copilot plugin install claude-skills@claude-skills
-  # later: copilot plugin update claude-skills
+  copilot plugin install parking-lot@claude-skills
+  # later: copilot plugin update parking-lot
   ```
-  It loads as a plugin extension. Claude Code ignores it.
+  It loads as a plugin extension. The plugin is Copilot-only; Claude Code's marketplace doesn't list it.
+
+  > **Upgrading from `claude-skills` 1.4.0?** Parking Lot used to ship inside `claude-skills`. After `copilot plugin update claude-skills`, run `copilot plugin install parking-lot@claude-skills` to keep it.
 - **From GitHub**: in any Copilot chat, ask:
-  > Install the extension from `https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/extensions/parking-lot` with user scope
+  > Install the extension from `https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/plugins/parking-lot/extensions/parking-lot` with user scope
 - **From a gist**: Command palette → **Install extension from gist…**, paste the gist URL, and choose **User** scope.
 - **Manually**: copy this folder to `~/.copilot/extensions/parking-lot/` (Windows: `%USERPROFILE%\.copilot\extensions\parking-lot\`), then ask Copilot to "reload extensions".
 
@@ -55,8 +57,8 @@ The first time it loads, the app asks you to allow `parking-lot`. Approve it. If
 - Type an idea in the panel and press Enter. On your next message the agent will know about it, and asking "what's in my parking lot?" will list it.
 
 ### Update / uninstall
-- **Update**: plugin install: `copilot plugin update claude-skills`. Other installs: reinstall from the same URL (or `git pull` in the folder). Then "reload extensions".
-- **Uninstall**: plugin install: `copilot plugin uninstall claude-skills`. Manual install: delete `~/.copilot/extensions/parking-lot/`. Then "reload extensions".
+- **Update**: plugin install: `copilot plugin update parking-lot`. Other installs: reinstall from the same URL (or `git pull` in the folder). Then "reload extensions".
+- **Uninstall**: plugin install: `copilot plugin uninstall parking-lot`. Manual install: delete `~/.copilot/extensions/parking-lot/`. Then "reload extensions".
 
 ### Troubleshooting
 - **Panel or tools missing**: ask Copilot to "inspect the parking-lot extension". It reports the extension's status and the end of its log file.

@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-01
+
+### Added
+
+- `parking-lot` skill in the `parking-lot` plugin (`plugins/parking-lot/skills/parking-lot/`). `/parking-lot` (or `open`) opens the canvas, `list` shows open items, `next` shows the topmost item and asks before starting it, `work <n>` works an item through to `done` with a completion note, and `/parking-lot <text>` parks an item. Natural-language equivalents ("what's next", "do #3") count as commands, not new items.
+- Parking Lot panel: a ✎ Edit hover button on each row, next to ▶ / ⚡ / ✕. It does the same thing as double-clicking the text, which still works.
+
+### Changed
+
+- Parking Lot is now its own Copilot-only plugin, `parking-lot` (1.0.0), at `plugins/parking-lot/` with a legacy `.plugin/plugin.json` that declares `"extensions": "./extensions"`. The extension moved to `plugins/parking-lot/extensions/parking-lot/`; its code is unchanged.
+- Copilot discovers `parking-lot` through `.plugin/marketplace.json`, a Copilot-only marketplace manifest listing both plugins that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace still lists only `claude-skills`.
+- `claude-skills` description no longer mentions Parking Lot.
+- Parking Lot ▶ / ⚡ buttons now send `/parking-lot work <n> — <item text>`, with `Notes: …` on the next line if the item has notes. Extension-sent prompts deliver slash commands as plain text (verified), so the skill is matched from its description.
+
+### Removed
+
+- Root `.plugin/plugin.json`. `claude-skills` is back to a single manifest, `.claude-plugin/plugin.json`, which Copilot also reads.
+
+### Migration
+
+- If you got Parking Lot through `claude-skills` 1.4.0, run `copilot plugin update claude-skills`, then `copilot plugin install parking-lot@claude-skills`.
 ## [1.4.0] - 2026-10-01
 
 ### Added
