@@ -20,6 +20,7 @@ claude plugin install claude-skills@claude-skills
 # Copilot CLI equivalent
 copilot plugin marketplace add AbdouMoumen/claude-skills-plugin
 copilot plugin install claude-skills@claude-skills
+copilot plugin install parking-lot@claude-skills   # optional: GitHub Copilot app canvas
 ```
 
 <details>
@@ -68,13 +69,15 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 | **handoff** | Compact the current conversation into a handoff document for another agent to pick up. |
 | **judgment-evidence** | Capture moments of good user judgment to a personal append-only store. Silent live capture during a session + end-of-session review sweep. Main store at `~/.agents/` (shareable), machine-local sidecar at `~/.agents-local/` (verbatim text + paths, kept in a separate directory so it can't be accidentally synced). Per-repo anonymization with deterministic repo hashes; unknown repos default to anonymized. |
 
-## Extensions (GitHub Copilot app only)
+## Other plugins (GitHub Copilot only)
 
-| Extension | Description |
-|-----------|-------------|
-| **parking-lot** | 🅿️ A per-session backlog canvas. Park ideas for later; the agent sees them each turn but only acts when asked. See [`extensions/parking-lot/README.md`](extensions/parking-lot/README.md). |
+| Plugin | Description |
+|--------|-------------|
+| **parking-lot** | 🅿️ A per-session backlog canvas extension for the GitHub Copilot app. Park ideas for later; the agent sees them each turn but only acts when asked. Install with `copilot plugin install parking-lot@claude-skills`. See [`plugins/parking-lot/extensions/parking-lot/README.md`](plugins/parking-lot/extensions/parking-lot/README.md). |
 
-Extensions load only in the GitHub Copilot app. Claude Code ignores them. Copilot discovers them through `.plugin/plugin.json`, a Copilot-only manifest that Copilot reads before `.claude-plugin/plugin.json`. The `extensions` key lives only in `.plugin/plugin.json` because Claude Code's manifest validation rejects it. Keep the two manifests in sync.
+`parking-lot` is listed only in `.plugin/marketplace.json`, a Copilot-only marketplace manifest that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace schema can't hide an entry from one client, and the plugin's `extensions` key fails Claude Code's manifest validation, so Claude Code never sees it. Keep the `claude-skills` entry in both marketplace files in sync.
+
+> **Migrating from 1.4.0:** Parking Lot used to ship inside `claude-skills`. After `copilot plugin update claude-skills`, run `copilot plugin install parking-lot@claude-skills` to keep it.
 
 ## Usage
 
@@ -133,12 +136,14 @@ Skills are **model-invoked** — Claude automatically uses them based on context
 ```
 claude-skills-plugin/
 ├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest (Claude Code; Copilot fallback)
-│   └── marketplace.json
+│   ├── plugin.json              # claude-skills manifest (Claude Code and Copilot)
+│   └── marketplace.json         # Claude Code marketplace (claude-skills only)
 ├── .plugin/
-│   └── plugin.json              # Copilot-only manifest (adds "extensions"); keep in sync
-├── extensions/
-│   └── parking-lot/             # Copilot app canvas extension
+│   └── marketplace.json         # Copilot marketplace (claude-skills + parking-lot)
+├── plugins/
+│   └── parking-lot/             # Copilot-only plugin
+│       ├── .plugin/plugin.json  # Legacy manifest with "extensions"
+│       └── extensions/parking-lot/
 ├── skills/
 │   ├── skill-creator/           # Meta-skill for creating skills
 │   │   ├── SKILL.md

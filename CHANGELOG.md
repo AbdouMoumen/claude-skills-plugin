@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-01
+
+### Changed
+
+- Parking Lot is now its own Copilot-only plugin, `parking-lot` (1.0.0), at `plugins/parking-lot/` with a legacy `.plugin/plugin.json` that declares `"extensions": "./extensions"`. The extension moved to `plugins/parking-lot/extensions/parking-lot/`; its code is unchanged.
+- Copilot discovers `parking-lot` through `.plugin/marketplace.json`, a Copilot-only marketplace manifest listing both plugins that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace still lists only `claude-skills`.
+- `claude-skills` description no longer mentions Parking Lot.
+
+### Removed
+
+- Root `.plugin/plugin.json`. `claude-skills` is back to a single manifest, `.claude-plugin/plugin.json`, which Copilot also reads.
+
+### Migration
+
+- If you got Parking Lot through `claude-skills` 1.4.0, run `copilot plugin update claude-skills`, then `copilot plugin install parking-lot@claude-skills`.
 ## [1.4.0] - 2026-10-01
 
 ### Added

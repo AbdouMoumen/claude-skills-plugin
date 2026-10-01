@@ -31,15 +31,17 @@ Stored in `<session workspace>/files/parking-lot.json`: one list per session, re
 
 ### 1. Install
 Choose one:
-- **As part of the `claude-skills` plugin** (recommended): install or update the plugin, then ask Copilot to "reload extensions" or start a new session.
+- **As the `parking-lot` plugin** (recommended): install the plugin, then ask Copilot to "reload extensions" or start a new session.
   ```bash
   copilot plugin marketplace add AbdouMoumen/claude-skills-plugin
-  copilot plugin install claude-skills@claude-skills
-  # later: copilot plugin update claude-skills
+  copilot plugin install parking-lot@claude-skills
+  # later: copilot plugin update parking-lot
   ```
-  It loads as a plugin extension. Claude Code ignores it.
+  It loads as a plugin extension. The plugin is Copilot-only; Claude Code's marketplace doesn't list it.
+
+  > **Upgrading from `claude-skills` 1.4.0?** Parking Lot used to ship inside `claude-skills`. After `copilot plugin update claude-skills`, run `copilot plugin install parking-lot@claude-skills` to keep it.
 - **From GitHub**: in any Copilot chat, ask:
-  > Install the extension from `https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/extensions/parking-lot` with user scope
+  > Install the extension from `https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/plugins/parking-lot/extensions/parking-lot` with user scope
 - **From a gist**: Command palette → **Install extension from gist…**, paste the gist URL, and choose **User** scope.
 - **Manually**: copy this folder to `~/.copilot/extensions/parking-lot/` (Windows: `%USERPROFILE%\.copilot\extensions\parking-lot\`), then ask Copilot to "reload extensions".
 
@@ -55,8 +57,8 @@ The first time it loads, the app asks you to allow `parking-lot`. Approve it. If
 - Type an idea in the panel and press Enter. On your next message the agent will know about it, and asking "what's in my parking lot?" will list it.
 
 ### Update / uninstall
-- **Update**: plugin install: `copilot plugin update claude-skills`. Other installs: reinstall from the same URL (or `git pull` in the folder). Then "reload extensions".
-- **Uninstall**: plugin install: `copilot plugin uninstall claude-skills`. Manual install: delete `~/.copilot/extensions/parking-lot/`. Then "reload extensions".
+- **Update**: plugin install: `copilot plugin update parking-lot`. Other installs: reinstall from the same URL (or `git pull` in the folder). Then "reload extensions".
+- **Uninstall**: plugin install: `copilot plugin uninstall parking-lot`. Manual install: delete `~/.copilot/extensions/parking-lot/`. Then "reload extensions".
 
 ### Troubleshooting
 - **Panel or tools missing**: ask Copilot to "inspect the parking-lot extension". It reports the extension's status and the end of its log file.

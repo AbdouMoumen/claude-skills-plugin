@@ -1,0 +1,13 @@
+{
+  "name": "parking-lot",
+  "description": "Parking Lot: a per-session backlog canvas for the GitHub Copilot app. Park ideas for later; the agent sees them each turn but only acts when asked.",
+  "version": "1.0.0",
+  "author": {
+    "name": "AbdouMoumen"
+  },
+  "homepage": "https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/plugins/parking-lot",
+  "repository": "https://github.com/AbdouMoumen/claude-skills-plugin",
+  "license": "MIT",
+  "extensions": "./extensions",
+  "keywords": ["copilot", "canvas", "extension", "backlog", "productivity"]
+}
