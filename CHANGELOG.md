@@ -4,6 +4,13 @@
 
 ### Added
 
+- Parking Lot (`parking-lot` 1.2.0): richer item context.
+  - Shift+Enter in the add box opens a notes field; Enter adds the item with its notes.
+  - Notes render as plain text with line breaks and clickable `http(s)` links, clamped to two lines (click to expand).
+  - Paste screenshots or files into the add-box notes or the ✎ edit form. They're copied to `<session files>/parking-lot/` (25 MB cap each) and shown as 📎 chips; images get a thumbnail that enlarges on click.
+  - `parking_add` / `parking_update` accept `attachments` (absolute paths of existing files), stored as references that are never copied or deleted. `parking_update`'s `status` is now optional so the agent can attach files without changing status. The agent can't remove attachments.
+  - `parking_list` shows full attachment paths. The per-prompt context and ▶ / ⚡ prompts show only a `📎N` marker.
+  - Deleting an item or Clear done deletes its copied files, with a confirm that says how many. Marking done keeps them. Missing referenced files are dimmed with ⚠.
 - Parking Lot panel (`parking-lot` 1.1.0): each row shows a muted relative time, `added 3d ago` for open items and `done 2h ago` for done items, with the full local date/time in a tooltip. Uses the existing `createdAt` / `completedAt` fields; no data format change.
 
 ### Changed

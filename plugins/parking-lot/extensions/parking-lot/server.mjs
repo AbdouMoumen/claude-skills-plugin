@@ -1,8 +1,9 @@
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { readFile, unlink } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { StoreError } from "./store.mjs";
+import { MAX_ATTACHMENT_BYTES, StoreError } from "./store.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const STATIC = {
@@ -25,15 +26,97 @@ async function readJson(req) {
     return raw ? JSON.parse(raw) : {};
 }
 
+async function readBody(req, limit) {
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of req) {
+        size += chunk.length;
+        if (size > limit) throw new StoreError("File is larger than 25 MB");
+        chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+}
+
+// Files pasted into the add box before the item exists, keyed by attachment id.
+const pending = new Map();
+
+function takePending(ids) {
+    return (Array.isArray(ids) ? ids : []).map((id) => pending.get(id)).filter(Boolean);
+}
+
+// Flags attachments whose file is gone so the panel can dim them.
+function decorate(state) {
+    for (const item of state.items) {
+        for (const a of item.attachments ?? []) a.missing = !existsSync(a.path);
+    }
+    return state;
+}
+
 // UI mutations. The panel is the user's surface, so these are attributed to "user".
 const routes = {
-    add: (s, b) => s.add({ text: b.text, notes: b.notes, addedBy: "user" }),
+    add: async (s, b) => {
+        const atts = takePending(b.uploads);
+        const item = await s.add({ text: b.text, notes: b.notes, addedBy: "user", attachments: atts });
+        for (const a of atts) pending.delete(a.id);
+        return item;
+    },
     status: (s, b) => s.setStatus({ id: b.id, status: b.status, by: "user" }),
     edit: (s, b) => s.edit({ id: b.id, text: b.text, notes: b.notes }),
     delete: (s, b) => s.remove(b.id),
     reorder: (s, b) => s.reorder(Array.isArray(b.ids) ? b.ids : []),
     "clear-done": (s) => s.clearDone(),
+    "remove-attachment": (s, b) => s.removeAttachment({ id: b.id, attachmentId: b.attachmentId }),
+    "discard-upload": async (s, b) => {
+        const a = pending.get(b.uploadId);
+        if (a) {
+            pending.delete(a.id);
+            await s.deleteCopies([a]);
+        }
+        return true;
+    },
 };
+
+// Serves a copied attachment, looked up by item id + attachment id only (never by a path from the request).
+async function serveFile(res, store, itemId, attId) {
+    const { items } = await store.snapshot();
+    const a = items.find((i) => i.id === Number(itemId))?.attachments?.find((x) => x.id === attId);
+    if (!store.isOwnCopy(a)) return send(res, 404, { error: "Not found" });
+    const image = a.mime?.startsWith("image/");
+    res.writeHead(200, {
+        "Content-Type": image ? a.mime : "application/octet-stream",
+        "Content-Disposition": image ? "inline" : "attachment",
+        "Content-Security-Policy": "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox",
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "private, max-age=3600",
+    });
+    res.end(await readFile(a.path));
+}
+
+// Raw file body; metadata in the query. ?item=<id> attaches directly, otherwise it's held for the next add.
+async function handleUpload(req, res, url, store) {
+    // A non-simple content type forces a CORS preflight, which we never approve.
+    if (req.headers["content-type"] !== "application/octet-stream") {
+        return send(res, 415, { error: "Expected application/octet-stream" });
+    }
+    const itemId = url.searchParams.get("item");
+    if (itemId) store.find(await store.snapshot(), itemId);
+    const entry = await store.writeCopy({
+        name: url.searchParams.get("name"),
+        mime: url.searchParams.get("mime"),
+        data: await readBody(req, MAX_ATTACHMENT_BYTES),
+    });
+    if (!itemId) {
+        pending.set(entry.id, entry);
+        return send(res, 200, { ok: true, result: entry });
+    }
+    try {
+        await store.addAttachments({ id: itemId, attachments: [entry] });
+    } catch (err) {
+        await store.deleteCopies([entry]);
+        throw err;
+    }
+    send(res, 200, { ok: true, result: entry });
+}
 
 export async function startServer(getStore, { onSend } = {}) {
     if (onSend) routes.send = (s, b) => onSend({ id: b.id, mode: b.mode === "immediate" ? "immediate" : "enqueue" });
@@ -57,18 +140,23 @@ export async function startServer(getStore, { onSend } = {}) {
                     "Cache-Control": "no-store",
                     Connection: "keep-alive",
                 });
-                res.write(`data: ${JSON.stringify(await store.snapshot())}\n\n`);
+                res.write(`data: ${JSON.stringify(decorate(await store.snapshot()))}\n\n`);
                 clients.add(res);
                 req.on("close", () => clients.delete(res));
                 if (!unsubscribe) {
                     const onChange = (state) => {
-                        for (const c of clients) c.write(`data: ${JSON.stringify(state)}\n\n`);
+                        const data = JSON.stringify(decorate(state));
+                        for (const c of clients) c.write(`data: ${data}\n\n`);
                     };
                     store.on("change", onChange);
                     unsubscribe = () => store.off("change", onChange);
                 }
                 return;
             }
+
+            const file = req.method === "GET" && url.pathname.match(/^\/files\/(\d+)\/([\w-]+)$/);
+            if (file) return await serveFile(res, store, file[1], file[2]);
+            if (req.method === "POST" && url.pathname === "/upload") return await handleUpload(req, res, url, store);
 
             const action = url.pathname.startsWith("/api/") && routes[url.pathname.slice(5)];
             if (req.method === "POST" && action) {
@@ -96,6 +184,8 @@ export async function startServer(getStore, { onSend } = {}) {
             new Promise((resolve) => {
                 unsubscribe?.();
                 for (const c of clients) c.end();
+                for (const a of pending.values()) unlink(a.path).catch(() => {});
+                pending.clear();
                 server.close(() => resolve());
             }),
     };
