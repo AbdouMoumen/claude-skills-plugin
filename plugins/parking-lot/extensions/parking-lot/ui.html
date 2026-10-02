@@ -9,9 +9,14 @@
   <h1>🅿️ Parking Lot</h1>
   <div class="sub">Ideas for later. The agent won't act on these unless you ask.</div>
   <form id="add">
-    <input id="text" type="text" placeholder="Park an idea… (Enter to add)" autocomplete="off" />
+    <input id="text" type="text" placeholder="Park an idea… (Enter to add, Shift+Enter for notes)" autocomplete="off" />
     <button type="submit">Add</button>
   </form>
+  <div id="addExtra" class="add-extra" hidden>
+    <textarea id="addNotes" placeholder="Notes (optional). Paste screenshots or files here. Enter to add, Shift+Enter for a new line."></textarea>
+    <div id="addAtts" class="atts"></div>
+    <div id="addErr" class="err"></div>
+  </div>
   <ul id="open"></ul>
   <details id="doneWrap">
     <summary><span id="doneLabel">Done (0)</span><button id="clear" type="button">Clear done</button></summary>

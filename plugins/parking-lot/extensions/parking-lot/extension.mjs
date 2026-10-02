@@ -4,7 +4,7 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { joinSession, createCanvas } from "@github/copilot-sdk/extension";
-import { ParkingStore, STATUSES } from "./store.mjs";
+import { ParkingStore, STATUSES, refAttachments } from "./store.mjs";
 import { startServer } from "./server.mjs";
 
 const MAX_INJECTED = 10;
@@ -23,18 +23,34 @@ function getStore() {
     return store;
 }
 
-function format(item) {
+function clip(item) {
+    const n = item.attachments?.length ?? 0;
+    return n ? ` 📎${n}` : "";
+}
+
+// Full attachment paths only with { paths: true } (parking_list); elsewhere just a 📎N marker.
+function format(item, { paths = false } = {}) {
     const status = item.status === "open" ? "" : ` [${item.status}]`;
     const notes = item.notes ? ` (notes: ${item.notes})` : "";
     const done = item.completionNote ? ` (done: ${item.completionNote})` : "";
-    return `#${item.id}${status} ${item.text}${notes}${done}`;
+    const files = paths ? (item.attachments ?? []).map((a) => `\n    📎 ${a.path}`).join("") : "";
+    return `#${item.id}${status} ${item.text}${clip(item)}${notes}${done}${files}`;
 }
+
+const ATTACHMENTS_PARAM = {
+    type: "array",
+    items: { type: "string" },
+    description:
+        "Optional absolute paths of existing files to reference on the item (e.g. screenshots, logs). " +
+        "They're linked, not copied, and never deleted. You can add attachments but not remove them.",
+};
 
 const tools = [
     {
         name: "parking_list",
         description:
             "List the user's Parking Lot: a backlog of ideas they want to explore later in this session. " +
+            "Shows each item's attachments (📎) as absolute file paths you can read. " +
             "Read-only. Do not start working on items unless the user explicitly asks.",
         parameters: {
             type: "object",
@@ -43,7 +59,7 @@ const tools = [
         handler: async ({ includeDone } = {}) => {
             const { items } = await getStore().snapshot();
             const shown = includeDone ? items : items.filter((i) => i.status !== "done");
-            return shown.length ? shown.map(format).join("\n") : "The parking lot is empty.";
+            return shown.length ? shown.map((i) => format(i, { paths: true })).join("\n") : "The parking lot is empty.";
         },
     },
     {
@@ -56,35 +72,41 @@ const tools = [
             properties: {
                 text: { type: "string", description: "Short description of the idea." },
                 notes: { type: "string", description: "Optional extra context." },
+                attachments: ATTACHMENTS_PARAM,
             },
             required: ["text"],
         },
-        handler: async ({ text, notes }) => {
-            const item = await getStore().add({ text, notes, addedBy: "agent" });
-            return `Parked ${format(item)}`;
+        handler: async ({ text, notes, attachments }) => {
+            const item = await getStore().add({ text, notes, addedBy: "agent", attachments: refAttachments(attachments) });
+            return `Parked ${format(item, { paths: true })}`;
         },
     },
     {
         name: "parking_update",
         description:
-            "Change the status of a Parking Lot item. Set in_progress when the user asks you to work on it, done when " +
-            "finished. If your current work incidentally completed an item, you may mark it done. A note explaining " +
-            "what completed it is required for done. Cannot edit text or delete items; the user does that in the panel.",
+            "Change the status of a Parking Lot item and/or attach files to it. Set in_progress when the user asks you " +
+            "to work on it, done when finished. If your current work incidentally completed an item, you may mark it " +
+            "done. A note explaining what completed it is required for done. Omit status to only add attachments. " +
+            "Cannot edit text, remove attachments, or delete items; the user does that in the panel.",
         parameters: {
             type: "object",
             properties: {
                 id: { type: "integer", description: "Item number, e.g. 3 for #3." },
-                status: { type: "string", enum: STATUSES },
+                status: { type: "string", enum: STATUSES, description: "New status. Optional if attachments is given." },
                 note: { type: "string", description: "Required when status is done: one line on what completed it." },
+                attachments: ATTACHMENTS_PARAM,
             },
-            required: ["id", "status"],
+            required: ["id"],
         },
-        handler: async ({ id, status, note }) => {
+        handler: async ({ id, status, note, attachments }) => {
+            if (!status && !attachments?.length) throw new Error("Provide a status, attachments, or both.");
             if (status === "done" && !note?.trim()) {
                 throw new Error("A completion note is required when marking an item done.");
             }
-            const item = await getStore().setStatus({ id, status, note, by: "agent" });
-            return `Updated ${format(item)}`;
+            const refs = refAttachments(attachments);
+            let item = refs.length ? await getStore().addAttachments({ id, attachments: refs }) : null;
+            if (status) item = await getStore().setStatus({ id, status, note, by: "agent" });
+            return `Updated ${format(item, { paths: true })}`;
         },
     },
 ];
@@ -96,7 +118,7 @@ async function sendToAgent({ id, mode }) {
     const item = await getStore().setStatus({ id, status: "in_progress", by: "user" });
     const notes = item.notes ? `\nNotes: ${item.notes}` : "";
     await session.send({
-        prompt: `/parking-lot work ${item.id} — ${item.text}${notes}`,
+        prompt: `/parking-lot work ${item.id} — ${item.text}${clip(item)}${notes}`,
         mode,
     });
     return item;
@@ -132,13 +154,14 @@ session = await joinSession({
             const { items } = await getStore().snapshot();
             const open = items.filter((i) => i.status !== "done");
             if (!open.length) return;
-            const shown = open.slice(0, MAX_INJECTED).map(format).join("\n");
+            const shown = open.slice(0, MAX_INJECTED).map((i) => format(i)).join("\n");
             const more = open.length > MAX_INJECTED ? `\n…and ${open.length - MAX_INJECTED} more (use parking_list).` : "";
             return {
                 additionalContext:
                     "<parking_lot>\nThe user's Parking Lot: a backlog of ideas for LATER. Do NOT start, plan, or mention these " +
                     "unless the user explicitly asks (e.g. \"do #3\", \"grab the next one\" = topmost open item). If your current " +
-                    "work happens to fully complete one, mark it done with parking_update and a completion note.\n" +
+                    "work happens to fully complete one, mark it done with parking_update and a completion note. " +
+                    "📎N means the item has N attachments; parking_list shows their paths.\n" +
                     shown + more + "\n</parking_lot>",
             };
         },
