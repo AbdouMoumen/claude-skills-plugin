@@ -251,10 +251,20 @@ async function copyText(item) {
   toast(`Copied #${item.id}`);
 }
 
+// The send request can stay pending until the host accepts the message, so ignore repeats in flight.
+const sending = new Set();
+async function sendItem(item, body, feedback) {
+  const key = `${item.id}:${body.kind || "work"}`;
+  if (sending.has(key)) return;
+  sending.add(key);
+  if (feedback) toast(feedback);
+  try { await api("send", { id: item.id, ...body }); } finally { sending.delete(key); }
+}
+
 const actions = {
-  queue: (item) => api("send", { id: item.id, mode: "enqueue" }),
-  now: (item) => api("send", { id: item.id, mode: "immediate" }),
-  ask: async (item) => { if (await api("send", { id: item.id, kind: "ask" }) != null) toast(`Asked the agent about #${item.id}`); },
+  queue: (item) => sendItem(item, { mode: "enqueue" }),
+  now: (item) => sendItem(item, { mode: "immediate" }),
+  ask: (item) => sendItem(item, { kind: "ask" }, `Asked the agent about #${item.id}`),
   edit: (item) => { selected = item.id; editing = item.id; render(); },
   copy: copyText,
   toggle: (item) => api("status", { id: item.id, status: item.status === "done" ? "open" : "done" }),
@@ -519,6 +529,7 @@ document.addEventListener("keydown", (e) => {
   const run = KEY_ACTIONS[k.length === 1 ? k.toLowerCase() : k];
   if (!run || (item.status === "done" && (run === "queue" || run === "ask"))) return;
   e.preventDefault();
+  if (e.repeat) return;
   // Marking done hides the row when the Done section is collapsed; keep the selection in view.
   if (run === "toggle" && item.status !== "done" && !$("doneWrap").open) select(neighbor(item.id));
   actions[run](item);
