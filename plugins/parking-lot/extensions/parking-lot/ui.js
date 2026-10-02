@@ -262,8 +262,8 @@ async function sendItem(item, body, feedback) {
 }
 
 const actions = {
-  queue: (item) => sendItem(item, { mode: "enqueue" }),
-  now: (item) => sendItem(item, { mode: "immediate" }),
+  queue: (item) => sendItem(item, { mode: "enqueue" }, `Queued #${item.id} for the agent`),
+  now: (item) => sendItem(item, { mode: "immediate" }, `Sent #${item.id} to the agent now`),
   ask: (item) => sendItem(item, { kind: "ask" }, `Asked the agent about #${item.id}`),
   edit: (item) => { selected = item.id; editing = item.id; render(); },
   copy: copyText,
