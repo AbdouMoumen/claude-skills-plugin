@@ -1,11 +1,13 @@
 import { EventEmitter } from "node:events";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, unlinkSync } from "node:fs";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, resolve } from "node:path";
 
 export const STATUSES = ["open", "in_progress", "done"];
 export const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
+// Server-side undo window. A bit longer than the panel's 6 s toast so a late Undo click still lands.
+export const UNDO_MS = 8000;
 
 export class StoreError extends Error {}
 
@@ -42,6 +44,7 @@ export class ParkingStore extends EventEmitter {
         this.attachDir = join(dirname(filePath), "parking-lot");
         this.state = null;
         this.queue = Promise.resolve();
+        this.trash = new Map(); // undo token -> { entries: [{ item, index }], timer }
     }
 
     async load() {
@@ -194,14 +197,63 @@ export class ParkingStore extends EventEmitter {
         }
     }
 
-    async remove(id) {
-        const item = await this.mutate((state) => {
-            const item = this.find(state, id);
-            state.items = state.items.filter((i) => i !== item);
-            return item;
+    // Soft-removes matching items. Their copied files stay on disk until the undo window closes,
+    // so restore() can put the items back exactly (same id, position, status, notes, attachments).
+    async trashItems(pick) {
+        const entries = await this.mutate((state) => {
+            const entries = [];
+            state.items.forEach((item, index) => { if (pick(item)) entries.push({ item, index }); });
+            const gone = new Set(entries.map((e) => e.item));
+            state.items = state.items.filter((i) => !gone.has(i));
+            return entries;
         });
-        await this.deleteCopies(item.attachments ?? []);
-        return item;
+        if (!entries.length) return { token: null, items: [] };
+        const token = randomUUID();
+        const timer = setTimeout(() => this.purge(token).catch(() => {}), UNDO_MS);
+        timer.unref?.();
+        this.trash.set(token, { entries, timer });
+        return { token, items: entries.map((e) => e.item) };
+    }
+
+    async remove(id) {
+        const result = await this.trashItems((i) => i.id === Number(id));
+        if (!result.token) throw new StoreError(`No parking lot item #${id}`);
+        return result;
+    }
+
+    restore(token) {
+        const t = this.trash.get(token);
+        if (!t) return Promise.reject(new StoreError("Nothing to undo (the undo window has closed)"));
+        this.trash.delete(token);
+        clearTimeout(t.timer);
+        return this.mutate((state) => {
+            // Entries are in ascending original index, so inserting in order rebuilds the old layout.
+            for (const { item, index } of t.entries) state.items.splice(Math.min(index, state.items.length), 0, item);
+            return t.entries.map((e) => e.item);
+        });
+    }
+
+    async purge(token) {
+        const t = this.trash.get(token);
+        if (!t) return;
+        this.trash.delete(token);
+        clearTimeout(t.timer);
+        await this.deleteCopies(t.entries.flatMap((e) => e.item.attachments ?? []));
+    }
+
+    purgeTrash() {
+        return Promise.all([...this.trash.keys()].map((token) => this.purge(token).catch(() => {})));
+    }
+
+    // For process exit, when async work can't finish.
+    purgeTrashSync() {
+        for (const { entries, timer } of this.trash.values()) {
+            clearTimeout(timer);
+            for (const a of entries.flatMap((e) => e.item.attachments ?? [])) {
+                if (this.isOwnCopy(a)) try { unlinkSync(a.path); } catch {}
+            }
+        }
+        this.trash.clear();
     }
 
     reorder(ids) {
@@ -214,13 +266,8 @@ export class ParkingStore extends EventEmitter {
         });
     }
 
-    async clearDone() {
-        const removed = await this.mutate((state) => {
-            const done = state.items.filter((i) => i.status === "done");
-            state.items = state.items.filter((i) => i.status !== "done");
-            return done;
-        });
-        await this.deleteCopies(removed.flatMap((i) => i.attachments ?? []));
-        return removed.length;
+    clearDone() {
+        return this.trashItems((i) => i.status === "done");
     }
+
 }

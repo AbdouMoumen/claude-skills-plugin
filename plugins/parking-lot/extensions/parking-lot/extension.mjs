@@ -111,18 +111,25 @@ const tools = [
     },
 ];
 
-// Panel "Queue" / "Now" buttons: hand an item to the agent as a user message.
+// Panel "Queue" / "Send now" / "Ask" actions: hand an item to the agent as a user message.
 // session.send delivers slash commands as plain text (verified); the parking-lot
-// skill recognizes the "/parking-lot work <n>" shorthand by its description.
-async function sendToAgent({ id, mode }) {
-    const item = await getStore().setStatus({ id, status: "in_progress", by: "user" });
+// skill recognizes the "/parking-lot work|ask <n>" shorthand by its description.
+// "work" marks the item in_progress; "ask" only asks about it and leaves its status alone.
+async function sendToAgent({ id, mode, kind = "work" }) {
+    const s = getStore();
+    const item = kind === "ask"
+        ? s.find(await s.snapshot(), id)
+        : await s.setStatus({ id, status: "in_progress", by: "user" });
     const notes = item.notes ? `\nNotes: ${item.notes}` : "";
     await session.send({
-        prompt: `/parking-lot work ${item.id} — ${item.text}${clip(item)}${notes}`,
+        prompt: `/parking-lot ${kind} ${item.id} — ${item.text}${clip(item)}${notes}`,
         mode,
     });
     return item;
 }
+
+// Files of items deleted within the undo window would otherwise be orphaned.
+process.on("exit", () => store?.purgeTrashSync());
 
 const canvas = createCanvas({
     id: "parking-lot",
