@@ -277,8 +277,8 @@ const actions = {
 
 function menuEntries(item) {
   const entries = item.status === "done" ? [] : [
-    { label: "⚡ Send now", run: actions.now, title: "Send to the agent now (steer)" },
-    { label: "? Ask (answer, don't do)", key: "A", run: actions.ask, title: "Ask the agent about it without starting the work" },
+    { icon: "⚡", label: "Send now", run: actions.now, title: "Send to the agent now (steer)" },
+    { icon: "?", label: "Ask", key: "A", run: actions.ask, title: "Ask the agent about it without starting the work" },
     null,
   ];
   entries.push(
@@ -299,7 +299,7 @@ function openMenu(anchor, item) {
   for (const e of menuEntries(item)) {
     if (!e) { m.append(el("div", { className: "sep" })); continue; }
     const b = el("button", { type: "button", tabIndex: -1, className: e.danger ? "danger" : "", title: e.title || "" },
-      el("span", { textContent: e.label }), e.key ? el("kbd", { textContent: e.key }) : null);
+      el("span", {}, el("span", { className: "ico", textContent: e.icon || "" }), e.label), e.key ? el("kbd", { textContent: e.key }) : null);
     b.setAttribute("role", "menuitem");
     b.addEventListener("click", () => { closeMenu(false); e.run(item); });
     buttons.push(b);
