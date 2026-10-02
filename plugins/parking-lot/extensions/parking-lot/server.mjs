@@ -52,6 +52,12 @@ function decorate(state) {
     return state;
 }
 
+// Deletes are soft: the panel gets an undo token and how many copied files go with the items.
+function trashResult(s, { token, items }) {
+    const files = items.reduce((n, i) => n + (i.attachments ?? []).filter((a) => s.isOwnCopy(a)).length, 0);
+    return { token, ids: items.map((i) => i.id), count: items.length, files };
+}
+
 // UI mutations. The panel is the user's surface, so these are attributed to "user".
 const routes = {
     add: async (s, b) => {
@@ -62,9 +68,10 @@ const routes = {
     },
     status: (s, b) => s.setStatus({ id: b.id, status: b.status, by: "user" }),
     edit: (s, b) => s.edit({ id: b.id, text: b.text, notes: b.notes }),
-    delete: (s, b) => s.remove(b.id),
+    delete: async (s, b) => trashResult(s, await s.remove(b.id)),
     reorder: (s, b) => s.reorder(Array.isArray(b.ids) ? b.ids : []),
-    "clear-done": (s) => s.clearDone(),
+    "clear-done": async (s) => trashResult(s, await s.clearDone()),
+    restore: (s, b) => s.restore(String(b.token ?? "")),
     "remove-attachment": (s, b) => s.removeAttachment({ id: b.id, attachmentId: b.attachmentId }),
     "discard-upload": async (s, b) => {
         const a = pending.get(b.uploadId);
@@ -119,7 +126,12 @@ async function handleUpload(req, res, url, store) {
 }
 
 export async function startServer(getStore, { onSend } = {}) {
-    if (onSend) routes.send = (s, b) => onSend({ id: b.id, mode: b.mode === "immediate" ? "immediate" : "enqueue" });
+    if (onSend) routes.send = (s, b) => {
+        const kind = b.kind === "ask" ? "ask" : "work";
+        // Ask is always queued: it's a question, not a steer.
+        const mode = kind === "work" && b.mode === "immediate" ? "immediate" : "enqueue";
+        return onSend({ id: b.id, mode, kind });
+    };
     const clients = new Set();
     let unsubscribe = null;
 
@@ -186,6 +198,7 @@ export async function startServer(getStore, { onSend } = {}) {
                 for (const c of clients) c.end();
                 for (const a of pending.values()) unlink(a.path).catch(() => {});
                 pending.clear();
+                Promise.resolve(getStore()).then((s) => s.purgeTrash()).catch(() => {});
                 server.close(() => resolve());
             }),
     };

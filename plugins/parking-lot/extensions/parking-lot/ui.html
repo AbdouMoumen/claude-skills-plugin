@@ -6,8 +6,7 @@
   <link rel="stylesheet" href="/ui.css" />
 </head>
 <body>
-  <h1>🅿️ Parking Lot</h1>
-  <div class="sub">Ideas for later. The agent won't act on these unless you ask.</div>
+  <h1 id="title">🅿️ Parking Lot<span id="summary" class="summary"></span></h1>
   <form id="add">
     <input id="text" type="text" placeholder="Park an idea… (Enter to add, Shift+Enter for notes)" autocomplete="off" />
     <button type="submit">Add</button>
@@ -17,11 +16,15 @@
     <div id="addAtts" class="atts"></div>
     <div id="addErr" class="err"></div>
   </div>
+  <div id="nowLabel" class="section" hidden>Now</div>
+  <ul id="now"></ul>
+  <div id="nextLabel" class="section" hidden>Up next</div>
   <ul id="open"></ul>
   <details id="doneWrap">
     <summary><span id="doneLabel">Done (0)</span><button id="clear" type="button">Clear done</button></summary>
     <ul id="done"></ul>
   </details>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <script src="/ui.js"></script>
 </body>
 </html>

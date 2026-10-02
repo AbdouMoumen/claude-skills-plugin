@@ -4,6 +4,13 @@
 
 ### Added
 
+- Parking Lot (`parking-lot` 1.3.0): panel UX refresh.
+  - Each row has one compact split button, **▶ Queue** plus a **▾** menu with ⚡ Send now, Ask, Edit, Copy text, and Delete, in place of the ▶ / ⚡ / ✎ / ✕ hover icons. The menu is keyboard navigable and closes on Escape or an outside click. Done items get Edit, Copy text, and Delete.
+  - New **Ask** send kind: it queues `/parking-lot ask <n> — <text>` (with `📎N` and `Notes:` like work) and doesn't change the item's status. The skill gains an `ask <n>` command (discuss without working it; offer to work it or mark it done only if the user agrees) and an `argument-hint`.
+  - Delete and Clear done act immediately and show an undo toast (about 6s) instead of a confirm. Undo restores items exactly (ids, order, status, timestamps, notes, attachments). Removed items wait in a server-side trash, and their copied files are deleted only when the undo window expires or the extension stops. Ids are never reused.
+  - The open list is split into **Now** (in progress, with a left accent) and **Up next**; the labels are hidden when nothing is in progress. Drag reorder works within each section.
+  - Compact header: `🅿️ Parking Lot · N open · on #X`. The subtitle moved into the empty state, along with a shortcut hint.
+  - Keyboard: selectable rows; ↑/↓, Space (done), E (edit), Q (queue), A (ask), Del/Backspace (delete with undo), Alt+↑/↓ (move), Esc, and `/` or N (focus the add box). The legend appears in the empty state and the header tooltip.
 - Parking Lot (`parking-lot` 1.2.0): richer item context.
   - Shift+Enter in the add box opens a notes field; Enter adds the item with its notes.
   - Notes render as plain text with line breaks and clickable `http(s)` links, clamped to two lines (click to expand).
