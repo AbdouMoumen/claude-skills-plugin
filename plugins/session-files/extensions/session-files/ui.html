@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session Files</title>
+    <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <header id="sidebar-head">
+                <span id="title">Session Files</span>
+                <span id="count" class="muted"></span>
+                <label class="toggle" title="Show the session's own top-level files (events.jsonl, session.db, locks)">
+                    <input type="checkbox" id="internal"> internal
+                </label>
+                <button id="open-root" class="icon-btn" type="button" title="Open the session folder">↗</button>
+            </header>
+            <input id="filter" type="search" placeholder="Filter files…" autocomplete="off" spellcheck="false">
+            <nav id="tree" role="tree" aria-label="Session files"></nav>
+        </aside>
+        <main id="preview">
+            <header id="preview-head" hidden>
+                <span id="file-icon" class="icon"></span>
+                <div id="crumbs"></div>
+                <div id="meta" class="muted"></div>
+                <div id="tools">
+                    <button id="mode" type="button" hidden>Source</button>
+                    <button id="open" type="button" title="Open with the default app">Open</button>
+                    <button id="reveal" type="button" title="Show the file in its folder">Show in folder</button>
+                    <button id="copy" type="button" title="Copy absolute path">Copy path</button>
+                </div>
+            </header>
+            <section id="body"><p class="empty muted">Select a file to preview it.</p></section>
+        </main>
+    </div>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="icons.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>

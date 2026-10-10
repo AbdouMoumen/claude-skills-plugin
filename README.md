@@ -21,6 +21,7 @@ claude plugin install claude-skills@claude-skills
 copilot plugin marketplace add AbdouMoumen/claude-skills-plugin
 copilot plugin install claude-skills@claude-skills
 copilot plugin install parking-lot@claude-skills   # optional: GitHub Copilot app canvas
+copilot plugin install session-files@claude-skills # optional: GitHub Copilot app canvas
 ```
 
 <details>
@@ -75,7 +76,9 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 |--------|-------------|
 | **parking-lot** | 🅿️ A per-session backlog canvas extension for the GitHub Copilot app. Park ideas for later; the agent sees them each turn but only acts when asked. Install with `copilot plugin install parking-lot@claude-skills`. See [`plugins/parking-lot/extensions/parking-lot/README.md`](plugins/parking-lot/extensions/parking-lot/README.md). |
 
-`parking-lot` is listed only in `.plugin/marketplace.json`, a Copilot-only marketplace manifest that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace schema can't hide an entry from one client, and the plugin's `extensions` key fails Claude Code's manifest validation, so Claude Code never sees it. Keep the `claude-skills` entry in both marketplace files in sync.
+| **session-files** | 🗂️ A canvas extension for the GitHub Copilot app that browses and previews the files in the current session's folder (artifacts, research, checkpoints), with live updates. Install with `copilot plugin install session-files@claude-skills`. See [`plugins/session-files/extensions/session-files/README.md`](plugins/session-files/extensions/session-files/README.md). |
+
+`parking-lot` and `session-files` are listed only in `.plugin/marketplace.json`, a Copilot-only marketplace manifest that Copilot reads before `.claude-plugin/marketplace.json`. Claude Code's marketplace schema can't hide an entry from one client, and the plugins' `extensions` key fails Claude Code's manifest validation, so Claude Code never sees them. Keep the `claude-skills` entry in both marketplace files in sync.
 
 > **Migrating from 1.4.0:** Parking Lot used to ship inside `claude-skills`. After `copilot plugin update claude-skills`, run `copilot plugin install parking-lot@claude-skills` to keep it.
 
