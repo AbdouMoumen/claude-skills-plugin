@@ -1,0 +1,13 @@
+{
+  "name": "session-files",
+  "description": "Session Files: a canvas for the GitHub Copilot app that browses and previews the files in the current session's folder (artifacts, research, checkpoints).",
+  "version": "1.0.0",
+  "author": {
+    "name": "AbdouMoumen"
+  },
+  "homepage": "https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/plugins/session-files",
+  "repository": "https://github.com/AbdouMoumen/claude-skills-plugin",
+  "license": "MIT",
+  "extensions": "./extensions",
+  "keywords": ["copilot", "canvas", "extension", "artifacts", "files", "preview"]
+}
