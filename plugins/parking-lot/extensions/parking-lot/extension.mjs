@@ -111,15 +111,16 @@ const tools = [
     },
 ];
 
-// Panel "Queue" / "Send now" / "Ask" actions: hand an item to the agent as a user message.
-// session.send delivers slash commands as plain text (verified); the parking-lot
-// skill recognizes the "/parking-lot work|ask <n>" shorthand by its description.
-// "work" marks the item in_progress; "ask" only asks about it and leaves its status alone.
+// Panel "Queue" / "Send now" / "Ask" / "Start in sub-session" actions: hand an item to the agent
+// as a user message. session.send delivers slash commands as plain text (verified); the parking-lot
+// skill recognizes the "/parking-lot work|ask|spawn <n>" shorthand by its description.
+// "work" marks the item in_progress; "ask" leaves its status alone; "spawn" leaves it to the agent,
+// which creates the child session (extensions can't) and then sets the status.
 async function sendToAgent({ id, mode, kind = "work" }) {
     const s = getStore();
-    const item = kind === "ask"
-        ? s.find(await s.snapshot(), id)
-        : await s.setStatus({ id, status: "in_progress", by: "user" });
+    const item = kind === "work"
+        ? await s.setStatus({ id, status: "in_progress", by: "user" })
+        : s.find(await s.snapshot(), id);
     const notes = item.notes ? `\nNotes: ${item.notes}` : "";
     await session.send({
         prompt: `/parking-lot ${kind} ${item.id} — ${item.text}${clip(item)}${notes}`,
