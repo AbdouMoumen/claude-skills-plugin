@@ -11,7 +11,7 @@ A per-session backlog canvas for the GitHub Copilot app. Use it to park ideas yo
 
 The agent has no tool for deleting or rewording items or removing attachments; you do that in the panel. On each prompt, a hook gives the agent up to 10 open items, labeled "do NOT act unless asked". Items with attachments show only a `📎N` marker there; the agent calls `parking_list` for the paths.
 
-Say "show the parking lot" or run `/parking-lot` (or `/parking-lot open`) to open the panel. `/parking-lot list` shows open items, `/parking-lot next` shows the topmost one and asks before starting it, `/parking-lot work <n>` works an item, `/parking-lot ask <n>` discusses an item without working it or changing its status, and `/parking-lot <text>` parks a new one. Natural phrasing works too: "what's next", "do #3". The plugin's `parking-lot` skill (`plugins/parking-lot/skills/parking-lot/SKILL.md`) handles all of these. It treats text as a new item only when it reads like an idea or task, and asks if it's unsure.
+Say "show the parking lot" or run `/parking-lot` (or `/parking-lot open`) to open the panel. `/parking-lot list` shows open items, `/parking-lot next` shows the topmost one and asks before starting it, `/parking-lot work <n>` works an item, `/parking-lot ask <n>` discusses an item without working it or changing its status, `/parking-lot spawn <n>` has the agent start it in a new child session, and `/parking-lot <text>` parks a new one. Natural phrasing works too: "what's next", "do #3". The plugin's `parking-lot` skill (`plugins/parking-lot/skills/parking-lot/SKILL.md`) handles all of these. It treats text as a new item only when it reads like an idea or task, and asks if it's unsure.
 
 ### Panel
 - **Header**: `🅿️ Parking Lot · N open · on #X` (the in-progress ids). Hover it to see the keyboard shortcuts.
@@ -19,7 +19,8 @@ Say "show the parking lot" or run `/parking-lot` (or `/parking-lot open`) to ope
 - **Row actions**: each open item has a compact split button. **▶ Queue** sends `/parking-lot work <n> — <item text>` to the agent after its current work finishes (followed by `📎N` if the item has attachments), with `Notes: …` on the next line if the item has notes. **▾** opens a menu:
   - **⚡ Send now** steers the agent immediately. Both Queue and Send now mark the item `in_progress`. With the skill, the agent marks the item `done` with a completion note when it finishes. For questions or decisions, it checks with you before marking them done.
   - **Ask** queues `/parking-lot ask <n> — <item text>` in the same format. The agent answers or discusses the item without working it or changing its status.
-  - **Edit**, **Copy text**, and **Delete**.
+    - **⑂ Start in sub-session** queues `/parking-lot spawn <n> — <item text>` in the same format. The agent creates a child session (nested under this one in the sidebar) with a self-contained prompt for the item, sets the item `in_progress` with a note naming the child, and marks it `done` when the child reports back. The panel itself doesn't change the status; extensions can't create app sessions, so the agent does it.
+    - **Edit**, **Copy text**, and **Delete**.
 
   Done items get the same menu with only Edit, Copy text, and Delete; tick the checkbox to reopen one. Double-clicking the text also edits it. The menu closes on Escape or an outside click and works with the arrow keys and Enter. Extension-sent prompts deliver slash commands as plain text, so the agent picks up the skill from its description rather than from slash-command expansion.
 - **Undo**: Delete and **Clear done** act immediately, with no confirm. A toast (`Deleted #7 · Undo`, `Cleared 3 done · Undo`, which mentions how many copied files are involved) shows for about 6 seconds. Undo restores the items exactly: same ids, order, status, timestamps, notes, and attachments. Ids are never reused.
@@ -32,6 +33,7 @@ Say "show the parking lot" or run `/parking-lot` (or `/parking-lot open`) to ope
   | E | Edit |
   | Q | Queue |
   | A | Ask |
+  | S | Start in sub-session |
   | Del / Backspace | Delete (with undo) |
   | Alt+↑ / Alt+↓ | Move the item within its section |
   | Esc | Clear selection |
