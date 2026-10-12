@@ -280,8 +280,8 @@ function menuEntries(item) {
   const entries = item.status === "done" ? [] : [
     { icon: "⚡", label: "Send now", run: actions.now, title: "Send to the agent now (steer)" },
     { icon: "?", label: "Ask", key: "A", run: actions.ask, title: "Ask the agent about it without starting the work" },
-        { icon: "⑂", label: "Start in sub-session", key: "S", run: actions.spawn, title: "Have the agent start it in a new child session" },
-        null,
+    { icon: "⑂", label: "Start in sub-session", key: "S", run: actions.spawn, title: "Have the agent start it in a new child session" },
+    null,
   ];
   entries.push(
     { label: "Edit", key: "E", run: actions.edit },
