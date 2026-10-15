@@ -1,6 +1,6 @@
 {
   "name": "claude-skills",
-  "description": "Personal skills plus the Parking Lot and Session Files canvas extensions for the GitHub Copilot app. Copilot-only marketplace manifest; Claude Code reads .claude-plugin/marketplace.json.",
+  "description": "Personal skills plus the Parking Lot, Session Files, and HTML Canvas canvas extensions for the GitHub Copilot app. Copilot-only marketplace manifest; Claude Code reads .claude-plugin/marketplace.json.",
   "owner": {
     "name": "AbdouMoumen"
   },
@@ -21,6 +21,12 @@
       "name": "session-files",
       "description": "Session Files: a canvas for the GitHub Copilot app that browses and previews the files in the current session's folder (artifacts, research, checkpoints).",
       "source": "./plugins/session-files",
+      "version": "1.0.0"
+    },
+    {
+      "name": "html-canvas",
+      "description": "HTML Canvas: a canvas for the GitHub Copilot app that lets the agent render HTML directly (mockups, explainers, interactive widgets) with in-panel history, and lets the page send messages back to the agent.",
+      "source": "./plugins/html-canvas",
       "version": "1.0.0"
     }
   ]
