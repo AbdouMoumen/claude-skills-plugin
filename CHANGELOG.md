@@ -4,6 +4,7 @@
 
 ### Added
 
+- HTML Canvas (`html-canvas` 1.0.0): a new Copilot app canvas plugin that renders agent-provided HTML directly in a panel. It keeps a back/forward history saved under the session's `files/html-canvas/<instanceId>/`, forwards the app's theme tokens into the page, and gives pages `copilot.send(text, data?)` to message the agent right away. Pages run in a sandboxed frame and can load external resources. Ships with an `html-canvas` skill that tells the agent when to use the panel and how to handle messages from pages.
 - Parking Lot (`parking-lot` 1.3.0): panel UX refresh.
   - Each row has one compact split button, **▶ Queue** plus a **▾** menu with ⚡ Send now, Ask, Edit, Copy text, and Delete, in place of the ▶ / ⚡ / ✎ / ✕ hover icons. The menu is keyboard navigable and closes on Escape or an outside click. Done items get Edit, Copy text, and Delete.
   - New **Ask** send kind: it queues `/parking-lot ask <n> — <text>` (with `📎N` and `Notes:` like work) and doesn't change the item's status. The skill gains an `ask <n>` command (discuss without working it; offer to work it or mark it done only if the user agrees) and an `argument-hint`.
