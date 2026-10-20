@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const MAX_BYTES = 25 * 1024 * 1024;
 const UNDO_MS = 6000; // the server keeps deleted items' files a little longer (store.mjs UNDO_MS)
-const KEYS = "↑/↓ select · Space done · E edit · Q queue · A ask · Del delete · Alt+↑/↓ move · Esc deselect · / or N add";
+const KEYS = "↑/↓ select · Space done · E edit · Q queue · A ask · S sub-session · Del delete · Alt+↑/↓ move · Esc deselect · / or N add";
 let state = { items: [] };
 let editing = null;
 let editAtts = null; // refreshes the chips of the open ✎ form without re-rendering its inputs
@@ -265,6 +265,7 @@ const actions = {
   queue: (item) => sendItem(item, { mode: "enqueue" }, `Queued #${item.id} for the agent`),
   now: (item) => sendItem(item, { mode: "immediate" }, `Sent #${item.id} to the agent now`),
   ask: (item) => sendItem(item, { kind: "ask" }, `Asked the agent about #${item.id}`),
+  spawn: (item) => sendItem(item, { kind: "spawn" }, `Spawning #${item.id} in a sub-session`),
   edit: (item) => { selected = item.id; editing = item.id; render(); },
   copy: copyText,
   toggle: (item) => api("status", { id: item.id, status: item.status === "done" ? "open" : "done" }),
@@ -279,6 +280,7 @@ function menuEntries(item) {
   const entries = item.status === "done" ? [] : [
     { icon: "⚡", label: "Send now", run: actions.now, title: "Send to the agent now (steer)" },
     { icon: "?", label: "Ask", key: "A", run: actions.ask, title: "Ask the agent about it without starting the work" },
+    { icon: "⑂", label: "Start in sub-session", key: "S", run: actions.spawn, title: "Have the agent start it in a new child session" },
     null,
   ];
   entries.push(
@@ -492,7 +494,7 @@ document.addEventListener("mousedown", (e) => {
 addEventListener("resize", () => closeMenu(false));
 document.addEventListener("scroll", () => closeMenu(false), true);
 
-const KEY_ACTIONS = { " ": "toggle", e: "edit", q: "queue", a: "ask", Delete: "del", Backspace: "del" };
+const KEY_ACTIONS = { " ": "toggle", e: "edit", q: "queue", a: "ask", s: "spawn", Delete: "del", Backspace: "del" };
 
 document.addEventListener("keydown", (e) => {
   if (menu || e.defaultPrevented || e.ctrlKey || e.metaKey || document.querySelector(".overlay")) return;
@@ -527,7 +529,7 @@ document.addEventListener("keydown", (e) => {
   // Space/Enter on a focused button or link keep their normal meaning.
   if ((k === " " || k === "Enter") && t.closest?.("button, a, summary")) return;
   const run = KEY_ACTIONS[k.length === 1 ? k.toLowerCase() : k];
-  if (!run || (item.status === "done" && (run === "queue" || run === "ask"))) return;
+  if (!run || (item.status === "done" && (run === "queue" || run === "ask" || run === "spawn"))) return;
   e.preventDefault();
   if (e.repeat) return;
   // Marking done hides the row when the Done section is collapsed; keep the selection in view.

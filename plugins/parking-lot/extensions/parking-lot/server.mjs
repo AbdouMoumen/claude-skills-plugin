@@ -127,8 +127,8 @@ async function handleUpload(req, res, url, store) {
 
 export async function startServer(getStore, { onSend } = {}) {
     if (onSend) routes.send = (s, b) => {
-        const kind = b.kind === "ask" ? "ask" : "work";
-        // Ask is always queued: it's a question, not a steer.
+        const kind = b.kind === "ask" || b.kind === "spawn" ? b.kind : "work";
+        // Ask and spawn are always queued: neither is a steer.
         const mode = kind === "work" && b.mode === "immediate" ? "immediate" : "enqueue";
         return onSend({ id: b.id, mode, kind });
     };
