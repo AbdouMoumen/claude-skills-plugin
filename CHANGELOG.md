@@ -4,6 +4,7 @@
 
 ### Added
 
+- Parking Lot (`parking-lot` 1.4.1): double-clicking anywhere on an item row (open or done) now edits it, not just the text: notes, the #id, the timestamp, and empty row space all work. Double-clicks on the checkbox, drag grip, Queue / ▾ button, links, attachment chips, and the edit form are ignored. The row becomes selected, like E, and the double-click no longer selects text.
 - Parking Lot (`parking-lot` 1.4.0): start an item in a sub-session.
   - New **⑂ Start in sub-session** entry in the ▾ menu of open items (after Ask; shortcut S). It shows a `Spawning #N in a sub-session` toast and queues `/parking-lot spawn <n> — <text>` (with `📎N` and `Notes:` like work). The panel doesn't change the item's status.
   - The skill gains a `spawn <n>` command ("do #3 in a sub-session", "spin off #n"): the agent creates a child session with `create_session` and a self-contained kickoff prompt (text, notes, attachment paths, report back when done), sets the item `in_progress` with a note naming the child, and marks it `done` when the child reports completion. The child inherits the current project; from a general chat, the agent uses the configured project the item clearly belongs to (so the child nests and has a checkout), otherwise it creates a chat child. Extensions can't create app sessions themselves, so the panel hands the item to the agent.

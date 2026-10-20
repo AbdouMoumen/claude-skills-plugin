@@ -196,12 +196,11 @@ function completedTime(item) {
 function display(item) {
   const done = item.status === "done";
   const wrap = el("div");
-  const text = el("div", { className: "text", textContent: item.text, title: "Double-click to edit" });
+  const text = el("div", { className: "text", textContent: item.text });
   if (item.addedBy === "agent") text.append(el("span", { className: "badge", textContent: "🤖", title: "Added by agent" }));
   if (done && item.completedBy === "agent") text.append(el("span", { className: "badge", textContent: "🤖✓", title: "Completed by agent" }));
   const when = stamp(item);
   if (when) text.append(when);
-  text.addEventListener("dblclick", () => { editing = item.id; render(); });
   wrap.append(text);
   if (item.notes) wrap.append(notesView(item));
   if (item.attachments?.length) wrap.append(chips(item, false));
@@ -375,6 +374,16 @@ function row(item) {
   li.addEventListener("click", (e) => {
     if (!e.target.closest("input, textarea, .edit-box")) select(item.id);
   });
+  // Double-click anywhere on the row edits it, except on its controls.
+  const NO_DBL = "input, textarea, button, a, .grip, .split, .chip, .edit-box";
+  li.addEventListener("mousedown", (e) => {
+    if (e.detail > 1 && !e.target.closest("input, textarea")) e.preventDefault();
+  });
+  li.addEventListener("dblclick", (e) => {
+    if (editing === item.id || e.target.closest(NO_DBL)) return;
+    actions.edit(item);
+  });
+  li.title = editing === item.id ? "" : "Double-click to edit";
   return li;
 }
 
