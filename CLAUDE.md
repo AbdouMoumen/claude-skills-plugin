@@ -9,4 +9,4 @@
 ## Plugin Manifests
 
 - `claude-skills` has one manifest, `.claude-plugin/plugin.json`. Keep its version and description in sync with its entries in `.claude-plugin/marketplace.json` (Claude Code) and `.plugin/marketplace.json` (Copilot; read first).
-- `parking-lot` and `session-files` are Copilot-only: `plugins/<name>/.plugin/plugin.json` (legacy manifest, no `$schema`; has `"extensions"`, which Claude Code rejects). List them only in `.plugin/marketplace.json`.
+- `parking-lot`, `session-files`, and `html-canvas` are Copilot-only: `plugins/<name>/.plugin/plugin.json` (legacy manifest, no `$schema`; has `"extensions"`, which Claude Code rejects). List them only in `.plugin/marketplace.json`.

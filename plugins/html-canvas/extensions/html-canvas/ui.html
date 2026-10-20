@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTML Canvas</title>
+    <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+    <header id="bar">
+        <button id="back" class="icon-btn" type="button" title="Previous page" aria-label="Previous page" disabled>‹</button>
+        <button id="forward" class="icon-btn" type="button" title="Next page" aria-label="Next page" disabled>›</button>
+        <select id="history" aria-label="History" disabled></select>
+        <span id="count" class="muted"></span>
+        <button id="reload" class="icon-btn" type="button" title="Reload page" aria-label="Reload page" disabled>↻</button>
+    </header>
+    <main id="stage">
+        <p id="empty" class="muted">Nothing rendered yet. Ask the agent to show something here.</p>
+        <iframe id="frame" title="Rendered page" hidden
+            sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"
+            allow="clipboard-write; fullscreen" allowfullscreen></iframe>
+    </main>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="ui.js"></script>
+</body>
+</html>

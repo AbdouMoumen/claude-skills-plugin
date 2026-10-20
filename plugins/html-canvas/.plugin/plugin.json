@@ -1,0 +1,13 @@
+{
+  "name": "html-canvas",
+  "description": "HTML Canvas: a canvas for the GitHub Copilot app that lets the agent render HTML directly (mockups, explainers, interactive widgets) with in-panel history, and lets the page send messages back to the agent.",
+  "version": "1.0.0",
+  "author": {
+    "name": "AbdouMoumen"
+  },
+  "homepage": "https://github.com/AbdouMoumen/claude-skills-plugin/tree/main/plugins/html-canvas",
+  "repository": "https://github.com/AbdouMoumen/claude-skills-plugin",
+  "license": "MIT",
+  "extensions": "./extensions",
+  "keywords": ["copilot", "canvas", "extension", "html", "mockup", "preview"]
+}
