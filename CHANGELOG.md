@@ -4,6 +4,8 @@
 
 ### Added
 
+- `repair-sessions`: privacy-aware session corruption diagnosis and a conservative repair workflow, with synthetic acceptance cases instead of unverified embedded repair scripts.
+
 - Parking Lot (`parking-lot` 1.4.1): double-clicking anywhere on an item row (open or done) now edits it, not just the text: notes, the #id, the timestamp, and empty row space all work. Double-clicks on the checkbox, drag grip, Queue / ▾ button, links, attachment chips, and the edit form are ignored. The row becomes selected, like E, and the double-click no longer selects text.
 - Parking Lot (`parking-lot` 1.4.0): start an item in a sub-session.
   - New **⑂ Start in sub-session** entry in the ▾ menu of open items (after Ask; shortcut S). It shows a `Spawning #N in a sub-session` toast and queues `/parking-lot spawn <n> — <text>` (with `📎N` and `Notes:` like work). The panel doesn't change the item's status.
