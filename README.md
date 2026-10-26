@@ -55,6 +55,7 @@ alias claude='claude --plugin-dir ~/claude-skills-plugin'
 
 | Skill | Description |
 |-------|-------------|
+| **localization-audit** | Review hardcoded UI, locale consistency, message syntax and RTL support using project conventions. Read-only by default. |
 | **skill-creator** | Guides Claude through creating new skills using a 5-phase process (discovery, scope, design, implement, validate). Model-invoked when you ask to create a skill. |
 | **plugin-creator** | Guides through creating Claude Code plugins with slash commands, skills, hooks, and MCP servers. |
 | **forge** | Craft, optimize, and review AI prompts using proven techniques. Supports create, evaluate, and compare workflows. |
